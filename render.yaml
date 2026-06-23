@@ -3,10 +3,10 @@ services:
   - type: web
     name: nexgenhost-api
     runtime: node
-    region: oregon            # closest free region; change to frankfurt if needed
-    plan: free                # upgrade to starter ($7/mo) for persistent disk
+    region: oregon
+    plan: free
     rootDir: apps/api
-    buildCommand: npm install && npx prisma generate && npm run build
+    buildCommand: npm install && npm run build
     startCommand: npm start
     healthCheckPath: /health
     envVars:
@@ -14,19 +14,18 @@ services:
         value: production
       - key: PORT
         value: 3000
-      # ── Set these manually in Render Dashboard ────────────
       - key: DATABASE_URL
-        sync: false           # paste your Neon connection string
+        sync: false
       - key: REDIS_URL
-        sync: false           # paste Upstash Redis URL (see README)
+        sync: false
       - key: JWT_SECRET
-        generateValue: true   # Render auto-generates a secure secret
+        generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: DASHBOARD_URL
-        sync: false           # paste your Vercel frontend URL
+        sync: false
       - key: API_URL
-        sync: false           # paste this service's own Render URL
+        sync: false
       - key: PAYSTACK_SECRET_KEY
         sync: false
       - key: PAYSTACK_PUBLIC_KEY
