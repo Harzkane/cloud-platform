@@ -1,0 +1,183 @@
+// ══════════════════════════════════════════════════════════
+//  NexGenHost — Prisma Database Schema
+//  PostgreSQL 16, production-grade
+// ══════════════════════════════════════════════════════════
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────── Enums ──────────────────────────────
+
+enum Plan {
+  STARTER
+  PRO
+  BUSINESS
+}
+
+enum DeployStatus {
+  QUEUED
+  CLONING
+  BUILDING
+  PUSHING
+  STARTING
+  RUNNING
+  FAILED
+  STOPPED
+  CANCELLED
+}
+
+enum EnvType {
+  PRODUCTION
+  STAGING
+}
+
+enum DomainStatus {
+  PENDING
+  PROPAGATING
+  ACTIVE
+  FAILED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  TRIALING
+}
+
+// ─────────────────── Models ─────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  avatarUrl    String?
+  plan         Plan     @default(STARTER)
+  isVerified   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  projects      Project[]
+  subscriptions Subscription[]
+  apiKeys       ApiKey[]
+
+  @@map("users")
+}
+
+model Project {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  gitRepo    String   // https://github.com/user/repo
+  runtime    String   @default("node:20-alpine")
+  buildCmd   String   @default("npm run build")
+  startCmd   String   @default("npm start")
+  port       Int      @default(3000)
+  autoDeploy Boolean  @default(true)
+  branch     String   @default("main")
+  region     String   @default("af-south-1")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  environments Environment[]
+  deployments  Deployment[]
+  domains      Domain[]
+
+  @@map("projects")
+}
+
+model Environment {
+  id        String   @id @default(cuid())
+  projectId String
+  name      EnvType  @default(PRODUCTION)
+  variables Json     @default("{}") // encrypted key-value pairs
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  project     Project      @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  deployments Deployment[]
+
+  @@unique([projectId, name])
+  @@map("environments")
+}
+
+model Deployment {
+  id            String       @id @default(cuid())
+  projectId     String
+  environmentId String
+  commitHash    String
+  commitMsg     String       @default("")
+  branch        String       @default("main")
+  status        DeployStatus @default(QUEUED)
+  logs          String       @default("") // appended in chunks by Go worker
+  containerId   String?      // Docker container ID
+  imageTag      String?      // Docker image tag
+  liveUrl       String?      // assigned subdomain / custom domain
+  duration      Int?         // build+deploy duration in seconds
+  startedAt     DateTime     @default(now())
+  finishedAt    DateTime?
+  triggeredBy   String       @default("manual") // "manual" | "git-push" | "api"
+
+  project     Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  environment Environment @relation(fields: [environmentId], references: [id])
+
+  @@index([projectId])
+  @@index([status])
+  @@map("deployments")
+}
+
+model Domain {
+  id        String       @id @default(cuid())
+  projectId String
+  domain    String       @unique
+  type      String       @default("subdomain") // "subdomain" | "custom"
+  sslStatus DomainStatus @default(PENDING)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@map("domains")
+}
+
+model Subscription {
+  id                 String             @id @default(cuid())
+  userId             String
+  plan               Plan
+  status             SubscriptionStatus @default(ACTIVE)
+  paystackRef        String?            // Paystack subscription code
+  paystackCustomerId String?
+  currentPeriodStart DateTime
+  currentPeriodEnd   DateTime
+  cancelledAt        DateTime?
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  userId     String
+  name       String
+  keyHash    String    @unique // SHA-256 of the full key
+  keyPrefix  String    // first 8 chars shown in UI (e.g. "ngx_prod")
+  scopes     String[]  @default(["read"])
+  lastUsedAt DateTime?
+  expiresAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("api_keys")
+}

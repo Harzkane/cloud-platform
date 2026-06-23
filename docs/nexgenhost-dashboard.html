@@ -1,0 +1,4353 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexGenHost — Developer Dashboard</title>
+  <meta name="description"
+    content="NexGenHost — Affordable, developer-first cloud hosting built for Africa. Deploy apps in seconds.">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    /* ══════════════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════════════ */
+    :root {
+      /* Brand */
+      --brand: #1a6b3c;
+      --brand-lt: #e8f5ee;
+      --brand-mid: #145530;
+      --brand-dark: #0d3d22;
+      --brand-glow: rgba(26, 107, 60, 0.15);
+
+      /* Accent */
+      --accent: #10b981;
+      --accent-lt: #d1fae5;
+
+      /* Surfaces (dark mode) */
+      --bg: #0d1117;
+      --surface: #161b22;
+      --surface2: #1c2330;
+      --surface3: #21293a;
+      --surface4: #2a3446;
+      --border: rgba(255, 255, 255, 0.07);
+      --border2: rgba(255, 255, 255, 0.12);
+
+      /* Ink */
+      --ink: #e6edf3;
+      --ink2: #b0bec9;
+      --ink3: #768a9e;
+      --ink4: #4a5e72;
+
+      /* Status */
+      --success: #10b981;
+      --success-lt: rgba(16, 185, 129, 0.12);
+      --warning: #f59e0b;
+      --warning-lt: rgba(245, 158, 11, 0.12);
+      --danger: #ef4444;
+      --danger-lt: rgba(239, 68, 68, 0.12);
+      --info: #3b82f6;
+      --info-lt: rgba(59, 130, 246, 0.12);
+      --staging: #8b5cf6;
+      --staging-lt: rgba(139, 92, 246, 0.12);
+
+      --font-sans: 'Inter', sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+
+      --radius: 8px;
+      --radius-sm: 5px;
+      --sidebar-w: 240px;
+      --topbar-h: 60px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   RESET & BASE
+══════════════════════════════════════════════════ */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      min-height: 100vh;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar {
+      width: 5px;
+      height: 5px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--surface4);
+      border-radius: 3px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════════════════ */
+    .topbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--topbar-h);
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px 0 0;
+      z-index: 100;
+      gap: 0;
+    }
+
+    .topbar-logo {
+      width: var(--sidebar-w);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 20px;
+      border-right: 1px solid var(--border);
+      height: 100%;
+      flex-shrink: 0;
+    }
+
+    .logo-mark {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--brand), var(--accent));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+      box-shadow: 0 0 12px var(--brand-glow);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .logo-name {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      background: linear-gradient(135deg, #fff, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-tagline {
+      font-size: 9px;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 500;
+    }
+
+    .topbar-center {
+      flex: 1;
+      padding: 0 20px;
+    }
+
+    .topbar-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      max-width: 360px;
+      transition: border-color 0.15s;
+    }
+
+    .topbar-search:focus-within {
+      border-color: var(--brand);
+    }
+
+    .topbar-search input {
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      flex: 1;
+    }
+
+    .topbar-search input::placeholder {
+      color: var(--ink4);
+    }
+
+    .search-icon {
+      color: var(--ink4);
+      font-size: 13px;
+    }
+
+    .search-shortcut {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--ink4);
+      background: var(--surface3);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border2);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .topbar-btn {
+      width: 34px;
+      height: 34px;
+      background: none;
+      border: none;
+      border-radius: var(--radius-sm);
+      color: var(--ink3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .topbar-btn:hover {
+      background: var(--surface2);
+      color: var(--ink);
+    }
+
+    .notif-badge {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      width: 7px;
+      height: 7px;
+      background: var(--danger);
+      border-radius: 50%;
+      border: 1.5px solid var(--surface);
+    }
+
+    .topbar-divider {
+      width: 1px;
+      height: 28px;
+      background: var(--border);
+      margin: 0 6px;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 2px solid var(--border2);
+      transition: border-color 0.15s;
+    }
+
+    .user-avatar:hover {
+      border-color: var(--brand);
+    }
+
+    /* ══════════════════════════════════════════════════
+   LAYOUT
+══════════════════════════════════════════════════ */
+    .app-layout {
+      display: flex;
+      margin-top: var(--topbar-h);
+      min-height: calc(100vh - var(--topbar-h));
+    }
+
+    /* ══════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════ */
+    .sidebar {
+      width: var(--sidebar-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      position: fixed;
+      top: var(--topbar-h);
+      bottom: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 50;
+    }
+
+    .sidebar-content {
+      flex: 1;
+      padding: 16px 0;
+    }
+
+    .sidebar-section {
+      margin-bottom: 4px;
+    }
+
+    .sidebar-heading {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--ink4);
+      padding: 0 16px;
+      margin: 16px 0 4px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 16px;
+      font-size: 13px;
+      color: var(--ink3);
+      cursor: pointer;
+      border-left: 2px solid transparent;
+      transition: all 0.12s;
+      border-radius: 0;
+      text-decoration: none;
+      position: relative;
+    }
+
+    .sidebar-item:hover {
+      background: var(--surface2);
+      color: var(--ink);
+    }
+
+    .sidebar-item.active {
+      background: linear-gradient(90deg, rgba(26, 107, 60, 0.15), transparent);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .si-icon {
+      width: 18px;
+      text-align: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .si-badge {
+      margin-left: auto;
+      background: var(--danger);
+      color: white;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 10px;
+    }
+
+    .si-badge.warn {
+      background: var(--warning);
+    }
+
+    .si-badge.info {
+      background: var(--info);
+    }
+
+    .sidebar-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 8px 16px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+    }
+
+    .user-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .user-card:hover {
+      background: var(--surface2);
+    }
+
+    .user-avatar-sm {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .user-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .user-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-plan {
+      font-size: 10px;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .plan-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.5;
+        transform: scale(0.8);
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   MAIN CONTENT
+══════════════════════════════════════════════════ */
+    .main {
+      flex: 1;
+      margin-left: var(--sidebar-w);
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      min-width: 0;
+    }
+
+    /* ══════════════════════════════════════════════════
+   PAGE SECTIONS (view switching)
+══════════════════════════════════════════════════ */
+    .page {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .page.active {
+      display: flex;
+      animation: fadeUp 0.2s ease both;
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   PAGE HEADER
+══════════════════════════════════════════════════ */
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .page-title-block {}
+
+    .page-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.3px;
+      margin-bottom: 3px;
+    }
+
+    .page-subtitle {
+      font-size: 12px;
+      color: var(--ink3);
+    }
+
+    .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════
+   BUTTONS
+══════════════════════════════════════════════════ */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font-sans);
+      border: none;
+      transition: all 0.15s;
+      letter-spacing: 0.1px;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--brand);
+      color: white;
+      box-shadow: 0 1px 6px var(--brand-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent);
+      box-shadow: 0 2px 12px rgba(16, 185, 129, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--ink2);
+      border: 1px solid var(--border2);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface3);
+      color: var(--ink);
+    }
+
+    .btn-ghost {
+      background: none;
+      color: var(--ink3);
+      border: 1px solid var(--border);
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface2);
+      color: var(--ink);
+    }
+
+    .btn-danger {
+      background: var(--danger-lt);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    /* ══════════════════════════════════════════════════
+   STAT CARDS
+══════════════════════════════════════════════════ */
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.15s, transform 0.15s;
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-1px);
+    }
+
+    .stat-card:hover::before {
+      opacity: 1;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink3);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-sub {
+      font-size: 11px;
+      color: var(--ink4);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-sub.up {
+      color: var(--success);
+    }
+
+    .stat-sub.down {
+      color: var(--danger);
+    }
+
+    .stat-sub.warn {
+      color: var(--warning);
+    }
+
+    .stat-icon {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      font-size: 20px;
+      opacity: 0.2;
+    }
+
+    /* ══════════════════════════════════════════════════
+   PANEL
+══════════════════════════════════════════════════ */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .panel-meta {
+      font-size: 11px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    .panel-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   TABLE
+══════════════════════════════════════════════════ */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .data-table th {
+      padding: 10px 16px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--ink4);
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      white-space: nowrap;
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--ink2);
+      vertical-align: middle;
+    }
+
+    .data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .data-table tbody tr {
+      transition: background 0.1s;
+      cursor: pointer;
+    }
+
+    .data-table tbody tr:hover td {
+      background: var(--surface2);
+    }
+
+    .td-mono {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink3);
+    }
+
+    .td-primary {
+      font-weight: 500;
+      color: var(--ink);
+    }
+
+    /* ══════════════════════════════════════════════════
+   BADGES / CHIPS
+══════════════════════════════════════════════════ */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    .badge-success {
+      background: var(--success-lt);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: var(--warning-lt);
+      color: var(--warning);
+    }
+
+    .badge-danger {
+      background: var(--danger-lt);
+      color: var(--danger);
+    }
+
+    .badge-info {
+      background: var(--info-lt);
+      color: var(--info);
+    }
+
+    .badge-staging {
+      background: var(--staging-lt);
+      color: var(--staging);
+    }
+
+    .badge-muted {
+      background: var(--surface3);
+      color: var(--ink4);
+    }
+
+    /* ══════════════════════════════════════════════════
+   STATUS DOT
+══════════════════════════════════════════════════ */
+    .status-dot {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot-success {
+      background: var(--success);
+      box-shadow: 0 0 0 2px var(--success-lt);
+      animation: dot-pulse 2s ease infinite;
+    }
+
+    .dot-warning {
+      background: var(--warning);
+    }
+
+    .dot-danger {
+      background: var(--danger);
+    }
+
+    .dot-info {
+      background: var(--info);
+    }
+
+    .dot-muted {
+      background: var(--ink4);
+    }
+
+    @keyframes dot-pulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 2px var(--success-lt);
+      }
+
+      50% {
+        box-shadow: 0 0 0 4px var(--success-lt);
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   TWO / THREE COLUMN GRIDS
+══════════════════════════════════════════════════ */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+
+    .grid-6040 {
+      display: grid;
+      grid-template-columns: 60% 1fr;
+      gap: 16px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   PROGRESS BAR
+══════════════════════════════════════════════════ */
+    .progress-bar {
+      height: 5px;
+      background: var(--surface3);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 6px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 10px;
+      background: linear-gradient(90deg, var(--brand), var(--accent));
+      transition: width 0.5s ease;
+    }
+
+    .progress-fill.warn {
+      background: linear-gradient(90deg, var(--warning), #fbbf24);
+    }
+
+    .progress-fill.danger {
+      background: linear-gradient(90deg, var(--danger), #f87171);
+    }
+
+    /* ══════════════════════════════════════════════════
+   LOG TERMINAL
+══════════════════════════════════════════════════ */
+    .log-terminal {
+      background: #0a0e13;
+      border-radius: var(--radius-sm);
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      line-height: 1.7;
+      min-height: 220px;
+      max-height: 340px;
+      overflow-y: auto;
+      color: #a8d8b0;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .log-line {
+      display: flex;
+      gap: 12px;
+    }
+
+    .log-time {
+      color: #4a6070;
+      flex-shrink: 0;
+    }
+
+    .log-success {
+      color: #10b981;
+    }
+
+    .log-info {
+      color: #60a5fa;
+    }
+
+    .log-warn {
+      color: #f59e0b;
+    }
+
+    .log-error {
+      color: #ef4444;
+    }
+
+    .log-muted {
+      color: #4a6070;
+    }
+
+    /* ══════════════════════════════════════════════════
+   DRAWER (slide-out panel)
+══════════════════════════════════════════════════ */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
+      z-index: 200;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s;
+    }
+
+    .drawer-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      right: -520px;
+      width: 500px;
+      height: 100%;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      box-shadow: -8px 0 40px rgba(0, 0, 0, 0.4);
+      z-index: 201;
+      display: flex;
+      flex-direction: column;
+      transition: right 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .drawer.open {
+      right: 0;
+    }
+
+    .drawer-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .drawer-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .drawer-subtitle {
+      font-size: 11px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    .drawer-close {
+      background: none;
+      border: none;
+      color: var(--ink4);
+      cursor: pointer;
+      font-size: 20px;
+      padding: 2px;
+      border-radius: 4px;
+      transition: all 0.1s;
+    }
+
+    .drawer-close:hover {
+      background: var(--surface3);
+      color: var(--ink);
+    }
+
+    .drawer-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .drawer-section-title {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 4px;
+    }
+
+    .drawer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .drawer-field {}
+
+    .df-label {
+      font-size: 10px;
+      color: var(--ink4);
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .df-val {
+      font-size: 12px;
+      color: var(--ink);
+      font-weight: 500;
+    }
+
+    .df-val.mono {
+      font-family: var(--font-mono);
+      font-size: 11px;
+    }
+
+    .drawer-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      background: var(--surface2);
+      display: flex;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    /* ══════════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════════ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      transform: scale(0.96) translateY(8px);
+      transition: transform 0.2s ease;
+    }
+
+    .modal-backdrop.open .modal {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--ink4);
+      cursor: pointer;
+      font-size: 20px;
+      border-radius: 4px;
+      padding: 2px;
+      transition: all 0.1s;
+    }
+
+    .modal-close:hover {
+      background: var(--surface3);
+      color: var(--ink);
+    }
+
+    .modal-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    /* Form */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--ink2);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      padding: 8px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 13px;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--brand);
+      background: var(--surface3);
+    }
+
+    .form-input::placeholder {
+      color: var(--ink4);
+    }
+
+    .form-hint {
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    .form-select option {
+      background: var(--surface2);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   NOTICE BANNER
+══════════════════════════════════════════════════ */
+    .notice {
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      border: 1px solid;
+    }
+
+    .notice-info {
+      background: var(--info-lt);
+      border-color: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+    }
+
+    .notice-success {
+      background: var(--success-lt);
+      border-color: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+    }
+
+    .notice-warning {
+      background: var(--warning-lt);
+      border-color: rgba(245, 158, 11, 0.2);
+      color: #fcd34d;
+    }
+
+    .notice-danger {
+      background: var(--danger-lt);
+      border-color: rgba(239, 68, 68, 0.2);
+      color: #fca5a5;
+    }
+
+    /* ══════════════════════════════════════════════════
+   FILTER BAR
+══════════════════════════════════════════════════ */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      color: var(--ink4);
+      white-space: nowrap;
+    }
+
+    .filter-btn {
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--ink3);
+      cursor: pointer;
+      font-family: var(--font-sans);
+      transition: all 0.15s;
+    }
+
+    .filter-btn:hover {
+      color: var(--ink);
+      border-color: var(--border2);
+    }
+
+    .filter-btn.active {
+      background: var(--brand);
+      border-color: var(--brand);
+      color: white;
+    }
+
+    .search-input {
+      padding: 7px 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-family: var(--font-sans);
+      font-size: 12px;
+      outline: none;
+      min-width: 220px;
+      transition: border-color 0.15s;
+    }
+
+    .search-input:focus {
+      border-color: var(--brand);
+    }
+
+    .search-input::placeholder {
+      color: var(--ink4);
+    }
+
+    /* ══════════════════════════════════════════════════
+   PROJECT CARDS
+══════════════════════════════════════════════════ */
+    .project-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .project-card:hover {
+      border-color: var(--border2);
+      background: var(--surface2);
+      transform: translateX(2px);
+    }
+
+    .project-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .project-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .project-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .project-domain {
+      font-size: 11px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    .project-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .project-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   TIMELINE
+══════════════════════════════════════════════════ */
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 14px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      position: relative;
+    }
+
+    .timeline-item:last-child {
+      border-bottom: none;
+    }
+
+    .timeline-dot-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+      padding-top: 4px;
+    }
+
+    .t-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border2);
+      flex-shrink: 0;
+    }
+
+    .t-dot.success {
+      background: var(--success);
+    }
+
+    .t-dot.danger {
+      background: var(--danger);
+    }
+
+    .t-dot.warning {
+      background: var(--warning);
+    }
+
+    .t-dot.info {
+      background: var(--info);
+    }
+
+    .timeline-line {
+      width: 1px;
+      flex: 1;
+      background: var(--border);
+      margin-top: 4px;
+    }
+
+    .t-content {
+      flex: 1;
+    }
+
+    .t-title {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .t-desc {
+      font-size: 11px;
+      color: var(--ink3);
+    }
+
+    .t-time {
+      font-size: 10px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+      margin-top: 2px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   USAGE METERS
+══════════════════════════════════════════════════ */
+    .usage-item {
+      margin-bottom: 14px;
+    }
+
+    .usage-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+    }
+
+    .usage-label {
+      font-size: 12px;
+      color: var(--ink2);
+    }
+
+    .usage-value {
+      font-size: 12px;
+      font-family: var(--font-mono);
+      color: var(--ink3);
+    }
+
+    /* ══════════════════════════════════════════════════
+   API KEY LIST
+══════════════════════════════════════════════════ */
+    .api-key-row {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .api-key-row:last-child {
+      border-bottom: none;
+    }
+
+    .api-key-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--surface3);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .api-key-info {
+      flex: 1;
+    }
+
+    .api-key-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .api-key-value {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    .api-key-meta {
+      font-size: 10px;
+      color: var(--ink4);
+      margin-top: 1px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   DATABASE CARDS
+══════════════════════════════════════════════════ */
+    .db-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .db-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-1px);
+    }
+
+    .db-card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .db-icon {
+      font-size: 20px;
+    }
+
+    .db-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .db-type {
+      font-size: 10px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    .db-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .db-stat-label {
+      font-size: 10px;
+      color: var(--ink4);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .db-stat-value {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--ink2);
+    }
+
+    /* ══════════════════════════════════════════════════
+   BILLING PLAN CARDS
+══════════════════════════════════════════════════ */
+    .plan-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .plan-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .plan-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+    }
+
+    .plan-card.current {
+      border-color: var(--brand);
+      background: linear-gradient(135deg, rgba(26, 107, 60, 0.08), var(--surface));
+    }
+
+    .plan-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: var(--brand);
+      color: white;
+      font-size: 9px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      letter-spacing: 0.5px;
+    }
+
+    .plan-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 4px;
+    }
+
+    .plan-price {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.5px;
+      margin-bottom: 2px;
+    }
+
+    .plan-price span {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--ink4);
+    }
+
+    .plan-features {
+      margin-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .plan-feature {
+      font-size: 11px;
+      color: var(--ink3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .plan-feature::before {
+      content: '✓';
+      color: var(--success);
+      font-weight: 700;
+      font-size: 10px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   EMPTY STATE
+══════════════════════════════════════════════════ */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--ink4);
+    }
+
+    .empty-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+      opacity: 0.4;
+    }
+
+    .empty-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink3);
+      margin-bottom: 6px;
+    }
+
+    .empty-desc {
+      font-size: 12px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   DEPLOY PROGRESS
+══════════════════════════════════════════════════ */
+    .deploy-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .deploy-step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .deploy-step:last-child {
+      border-bottom: none;
+    }
+
+    .step-indicator {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-pending {
+      background: var(--surface3);
+      color: var(--ink4);
+    }
+
+    .step-active {
+      background: var(--info-lt);
+      color: var(--info);
+      animation: stepPulse 1.2s ease infinite;
+    }
+
+    .step-done {
+      background: var(--success-lt);
+      color: var(--success);
+    }
+
+    .step-failed {
+      background: var(--danger-lt);
+      color: var(--danger);
+    }
+
+    @keyframes stepPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 var(--info-lt);
+      }
+
+      50% {
+        box-shadow: 0 0 0 4px var(--info-lt);
+      }
+    }
+
+    .step-label {
+      font-size: 12px;
+      color: var(--ink2);
+      flex: 1;
+    }
+
+    .step-time {
+      font-size: 10px;
+      color: var(--ink4);
+      font-family: var(--font-mono);
+    }
+
+    /* ══════════════════════════════════════════════════
+   TOAST NOTIFICATION
+══════════════════════════════════════════════════ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 500;
+    }
+
+    .toast {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--ink);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      animation: toastIn 0.2s ease both;
+    }
+
+    .toast-icon {
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .toast-msg {
+      flex: 1;
+    }
+
+    .toast-close {
+      cursor: pointer;
+      color: var(--ink4);
+      font-size: 14px;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   DOMAIN LIST
+══════════════════════════════════════════════════ */
+    .domain-row {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .domain-row:last-child {
+      border-bottom: none;
+    }
+
+    .domain-info {
+      flex: 1;
+    }
+
+    .domain-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 2px;
+      font-family: var(--font-mono);
+    }
+
+    .domain-project {
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    .domain-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   SETTINGS ROWS
+══════════════════════════════════════════════════ */
+    .setting-row {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .setting-row:last-child {
+      border-bottom: none;
+    }
+
+    .setting-info {}
+
+    .setting-label {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 2px;
+    }
+
+    .setting-desc {
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    /* Toggle switch */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .toggle {
+      width: 36px;
+      height: 20px;
+      background: var(--surface4);
+      border-radius: 10px;
+      position: relative;
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+
+    .toggle.on {
+      background: var(--brand);
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 14px;
+      height: 14px;
+      background: white;
+      border-radius: 50%;
+      transition: left 0.2s;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .toggle.on::after {
+      left: 19px;
+    }
+
+    /* ══════════════════════════════════════════════════
+   TEAM MEMBER ROWS
+══════════════════════════════════════════════════ */
+    .member-row {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .member-row:last-child {
+      border-bottom: none;
+    }
+
+    .member-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .member-info {
+      flex: 1;
+    }
+
+    .member-name {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 1px;
+    }
+
+    .member-email {
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    /* ══════════════════════════════════════════════════
+   OVERVIEW SPECIFIC — Recent Deployments Inline
+══════════════════════════════════════════════════ */
+    .deploy-row {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .deploy-row:last-child {
+      border-bottom: none;
+    }
+
+    .deploy-row:hover {
+      background: var(--surface2);
+    }
+
+    .deploy-project-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .deploy-env {
+      font-size: 10px;
+    }
+
+    .deploy-commit {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--ink4);
+    }
+
+    .deploy-time {
+      font-size: 11px;
+      color: var(--ink4);
+      white-space: nowrap;
+    }
+
+    /* ══════════════════════════════════════════════════
+   RESPONSIVE TWEAKS
+══════════════════════════════════════════════════ */
+    @media (max-width: 1100px) {
+      .stat-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .plan-cards {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ══════════════════════════════════════════════════
+   MISC UTILITY
+══════════════════════════════════════════════════ */
+    .flex {
+      display: flex;
+    }
+
+    .flex-col {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .gap-8 {
+      gap: 8px;
+    }
+
+    .gap-12 {
+      gap: 12px;
+    }
+
+    .mt-4 {
+      margin-top: 4px;
+    }
+
+    .text-mono {
+      font-family: var(--font-mono);
+    }
+
+    .text-sm {
+      font-size: 11px;
+    }
+
+    .text-xs {
+      font-size: 10px;
+    }
+
+    .text-muted {
+      color: var(--ink4);
+    }
+
+    .text-brand {
+      color: var(--accent);
+    }
+
+    .fw-600 {
+      font-weight: 600;
+    }
+
+    .fw-500 {
+      font-weight: 500;
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ══ TOPBAR ══════════════════════════════════════ -->
+  <header class="topbar">
+    <div class="topbar-logo">
+      <div class="logo-mark">🚀</div>
+      <div class="logo-text">
+        <div class="logo-name">NexGenHost</div>
+        <div class="logo-tagline">Cloud for Africa</div>
+      </div>
+    </div>
+
+    <div class="topbar-center">
+      <div class="topbar-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" id="globalSearch" placeholder="Search projects, deployments, docs..."
+          onkeyup="handleGlobalSearch(this.value)">
+        <span class="search-shortcut">⌘K</span>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <button class="topbar-btn" title="Docs" onclick="showToast('info','📚 Opening documentation...')">📚</button>
+      <button class="topbar-btn" title="Notifications" onclick="switchPage('activity')">
+        🔔
+        <span class="notif-badge"></span>
+      </button>
+      <div class="topbar-divider"></div>
+      <div class="topbar-btn" style="font-size:13px; width:auto; padding:0 8px; gap:6px;" onclick="showUserMenu()">
+        <div class="user-avatar">JD</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ══ APP LAYOUT ══════════════════════════════════ -->
+  <div class="app-layout">
+
+    <!-- ══ SIDEBAR ══════════════════════════════════ -->
+    <aside class="sidebar">
+      <div class="sidebar-content">
+
+        <div class="sidebar-section">
+          <div class="sidebar-heading">Main</div>
+          <div class="sidebar-item active" id="nav-overview" onclick="switchPage('overview')">
+            <span class="si-icon">⊞</span> Overview
+          </div>
+          <div class="sidebar-item" id="nav-projects" onclick="switchPage('projects')">
+            <span class="si-icon">📁</span> Projects
+            <span class="si-badge info" style="background:var(--info-lt);color:var(--info);">12</span>
+          </div>
+          <div class="sidebar-item" id="nav-deployments" onclick="switchPage('deployments')">
+            <span class="si-icon">🚀</span> Deployments
+          </div>
+          <div class="sidebar-item" id="nav-databases" onclick="switchPage('databases')">
+            <span class="si-icon">🗄️</span> Databases
+          </div>
+          <div class="sidebar-item" id="nav-domains" onclick="switchPage('domains')">
+            <span class="si-icon">🌐</span> Domains
+          </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-heading">Account</div>
+          <div class="sidebar-item" id="nav-billing" onclick="switchPage('billing')">
+            <span class="si-icon">💳</span> Billing
+            <span class="si-badge warn">!</span>
+          </div>
+          <div class="sidebar-item" id="nav-apikeys" onclick="switchPage('apikeys')">
+            <span class="si-icon">🔑</span> API Keys
+          </div>
+          <div class="sidebar-item" id="nav-settings" onclick="switchPage('settings')">
+            <span class="si-icon">⚙️</span> Settings
+          </div>
+        </div>
+
+        <div class="sidebar-divider"></div>
+
+        <div class="sidebar-section">
+          <div class="sidebar-heading">Activity</div>
+          <div class="sidebar-item" id="nav-activity" onclick="switchPage('activity')">
+            <span class="si-icon">📋</span> Activity Log
+            <span class="si-badge">3</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="sidebar-footer">
+        <div class="user-card">
+          <div class="user-avatar-sm">JD</div>
+          <div class="user-info">
+            <div class="user-name">John Doe</div>
+            <div class="user-plan">
+              <div class="plan-dot"></div> Pro Plan · Active
+            </div>
+          </div>
+          <span style="color:var(--ink4); font-size:12px;">⋯</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ MAIN CONTENT ═══════════════════════════════ -->
+    <main class="main">
+
+      <!-- ════════════════════════════
+         PAGE: OVERVIEW
+    ════════════════════════════ -->
+      <section class="page active" id="page-overview">
+
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Welcome back, John 👋</div>
+            <div class="page-subtitle">Here's what's happening with your projects · <span id="live-time"
+                class="text-mono" style="font-size:11px;"></span></div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="switchPage('activity')">📋 Activity</button>
+            <button class="btn btn-primary" onclick="openModal('modal-new-project')">+ New Project</button>
+          </div>
+        </div>
+
+        <!-- Stat cards -->
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-icon">📁</div>
+            <div class="stat-label">Projects</div>
+            <div class="stat-value" id="stat-projects">12</div>
+            <div class="stat-sub up">↑ 2 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🚀</div>
+            <div class="stat-label">Deployments</div>
+            <div class="stat-value" id="stat-deployments">28</div>
+            <div class="stat-sub up">↑ 13 this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🗄️</div>
+            <div class="stat-label">Databases</div>
+            <div class="stat-value">8</div>
+            <div class="stat-sub">4 Active</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">📡</div>
+            <div class="stat-label">Bandwidth</div>
+            <div class="stat-value">128 <span style="font-size:16px;color:var(--ink3);">GB</span></div>
+            <div class="stat-sub warn">⚠ 64% this month</div>
+          </div>
+        </div>
+
+        <!-- Recent Deployments + Quick Stats -->
+        <div class="grid-6040">
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Recent Deployments</div>
+              <div class="panel-actions">
+                <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                  onclick="switchPage('deployments')">View All →</button>
+              </div>
+            </div>
+            <div id="recent-deploy-list">
+              <div class="deploy-row" onclick="openDeployDrawer('dep_a1b2c3')">
+                <span class="status-dot dot-success"></span>
+                <div style="flex:1;">
+                  <div class="deploy-project-name">e-commerce-api <span class="badge badge-success"
+                      style="margin-left:6px;">Production</span></div>
+                  <div class="deploy-commit td-mono">a1b2c3d · Fix cart total rounding</div>
+                </div>
+                <div class="deploy-time">2m ago</div>
+              </div>
+              <div class="deploy-row" onclick="openDeployDrawer('dep_d4e5f6')">
+                <span class="status-dot dot-warning"></span>
+                <div style="flex:1;">
+                  <div class="deploy-project-name">mobile-backend <span class="badge badge-staging"
+                      style="margin-left:6px;">Staging</span></div>
+                  <div class="deploy-commit td-mono">d4e5f6g · Add push notification route</div>
+                </div>
+                <div class="deploy-time">15m ago</div>
+              </div>
+              <div class="deploy-row" onclick="openDeployDrawer('dep_h7i8j9')">
+                <span class="status-dot dot-success"></span>
+                <div style="flex:1;">
+                  <div class="deploy-project-name">blog-platform <span class="badge badge-success"
+                      style="margin-left:6px;">Production</span></div>
+                  <div class="deploy-commit td-mono">h7i8j9k · Update SEO metadata</div>
+                </div>
+                <div class="deploy-time">1h ago</div>
+              </div>
+              <div class="deploy-row" onclick="openDeployDrawer('dep_k1l2m3')">
+                <span class="status-dot dot-danger"></span>
+                <div style="flex:1;">
+                  <div class="deploy-project-name">analytics-service <span class="badge badge-staging"
+                      style="margin-left:6px;">Staging</span></div>
+                  <div class="deploy-commit td-mono">k1l2m3n · Refactor metrics pipeline</div>
+                </div>
+                <div class="deploy-time">3h ago</div>
+              </div>
+              <div class="deploy-row" onclick="openDeployDrawer('dep_n4o5p6')">
+                <span class="status-dot dot-success"></span>
+                <div style="flex:1;">
+                  <div class="deploy-project-name">payment-gateway <span class="badge badge-success"
+                      style="margin-left:6px;">Production</span></div>
+                  <div class="deploy-commit td-mono">n4o5p6q · Paystack webhook v2</div>
+                </div>
+                <div class="deploy-time">5h ago</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right column: usage + alerts -->
+          <div style="display:flex;flex-direction:column;gap:16px;">
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">Resource Usage</div>
+                <div class="panel-meta">Pro Plan · Renews Jul 15</div>
+              </div>
+              <div style="padding:16px 20px;">
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">CPU</span>
+                    <span class="usage-value">28%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width:28%"></div>
+                  </div>
+                </div>
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">Memory</span>
+                    <span class="usage-value">1.1 GB / 4 GB</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width:27.5%"></div>
+                  </div>
+                </div>
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">Bandwidth</span>
+                    <span class="usage-value">128 GB / 200 GB</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill warn" style="width:64%"></div>
+                  </div>
+                </div>
+                <div class="usage-item">
+                  <div class="usage-header">
+                    <span class="usage-label">Projects</span>
+                    <span class="usage-value">12 / 20</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div class="progress-fill" style="width:60%"></div>
+                  </div>
+                </div>
+                <button class="btn btn-primary" style="width:100%;margin-top:8px;justify-content:center;"
+                  onclick="switchPage('billing')">Upgrade Plan →</button>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-header">
+                <div class="panel-title">Platform Status</div>
+                <div class="panel-meta"><span class="status-dot dot-success"
+                    style="display:inline-block;margin-right:4px;"></span>All Systems Operational</div>
+              </div>
+              <div style="padding:12px 20px;display:flex;flex-direction:column;gap:8px;">
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">API Gateway</span>
+                  <span class="badge badge-success">99.98% uptime</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">Worker Nodes (Go)</span>
+                  <span class="badge badge-success">Healthy ×4</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">Redis Queue</span>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">PostgreSQL</span>
+                  <span class="badge badge-success">Healthy</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">Cloudflare CDN</span>
+                  <span class="badge badge-success">Active</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span style="font-size:12px;color:var(--ink2);">Lagos Node (OCI)</span>
+                  <span class="badge badge-warning">Maintenance</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: PROJECTS
+    ════════════════════════════ -->
+      <section class="page" id="page-projects">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Projects</div>
+            <div class="page-subtitle">12 projects · 8 production · 4 staging</div>
+          </div>
+          <div class="page-actions">
+            <input type="text" class="search-input" placeholder="Search projects..."
+              oninput="filterProjects(this.value)" id="project-search">
+            <button class="btn btn-primary" onclick="openModal('modal-new-project')">+ New Project</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <span class="filter-label">Filter:</span>
+          <button class="filter-btn active" onclick="setProjectFilter('all', this)">All (12)</button>
+          <button class="filter-btn" onclick="setProjectFilter('production', this)">Production (8)</button>
+          <button class="filter-btn" onclick="setProjectFilter('staging', this)">Staging (4)</button>
+          <button class="filter-btn" onclick="setProjectFilter('failed', this)">Failed (1)</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">All Projects</div>
+            <div class="panel-meta">Sorted by last deploy</div>
+          </div>
+          <table class="data-table" id="projects-table">
+            <thead>
+              <tr>
+                <th>Project</th>
+                <th>Environment</th>
+                <th>Domain</th>
+                <th>Last Deploy</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="projects-tbody">
+              <tr data-env="production" onclick="openProjectDrawer('proj_001')">
+                <td>
+                  <div class="td-primary">e-commerce-api</div>
+                  <div class="td-mono">github: user/e-commerce-api</div>
+                </td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">api.nexgenhost.com</td>
+                <td class="td-mono">2m ago · a1b2c3d</td>
+                <td><span class="badge badge-success"><span class="status-dot dot-success"
+                      style="display:inline-block;margin-right:3px;"></span>Deployed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_a1b2c3')">Deploy</button></td>
+              </tr>
+              <tr data-env="staging" onclick="openProjectDrawer('proj_002')">
+                <td>
+                  <div class="td-primary">mobile-backend</div>
+                  <div class="td-mono">github: user/mobile-backend</div>
+                </td>
+                <td><span class="badge badge-staging">Staging</span></td>
+                <td class="td-mono">mobile-api.nexgenhost.com</td>
+                <td class="td-mono">15m ago · d4e5f6g</td>
+                <td><span class="badge badge-warning">Building</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_d4e5f6')">View</button></td>
+              </tr>
+              <tr data-env="production" onclick="openProjectDrawer('proj_003')">
+                <td>
+                  <div class="td-primary">blog-platform</div>
+                  <div class="td-mono">github: user/blog-platform</div>
+                </td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">blog.nexgenhost.com</td>
+                <td class="td-mono">1h ago · h7i8j9k</td>
+                <td><span class="badge badge-success"><span class="status-dot dot-success"
+                      style="display:inline-block;margin-right:3px;"></span>Deployed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_h7i8j9')">Deploy</button></td>
+              </tr>
+              <tr data-env="staging" onclick="openProjectDrawer('proj_004')">
+                <td>
+                  <div class="td-primary">analytics-service</div>
+                  <div class="td-mono">github: user/analytics-service</div>
+                </td>
+                <td><span class="badge badge-staging">Staging</span></td>
+                <td class="td-mono">analytics.nexgenhost.com</td>
+                <td class="td-mono">3h ago · k1l2m3n</td>
+                <td><span class="badge badge-danger">Failed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_k1l2m3')">View</button></td>
+              </tr>
+              <tr data-env="production" onclick="openProjectDrawer('proj_005')">
+                <td>
+                  <div class="td-primary">payment-gateway</div>
+                  <div class="td-mono">github: user/payment-gateway</div>
+                </td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">pay.nexgenhost.com</td>
+                <td class="td-mono">5h ago · n4o5p6q</td>
+                <td><span class="badge badge-success"><span class="status-dot dot-success"
+                      style="display:inline-block;margin-right:3px;"></span>Deployed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_n4o5p6')">Deploy</button></td>
+              </tr>
+              <tr data-env="production" onclick="openProjectDrawer('proj_006')">
+                <td>
+                  <div class="td-primary">auth-service</div>
+                  <div class="td-mono">github: user/auth-service</div>
+                </td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">auth.nexgenhost.com</td>
+                <td class="td-mono">12h ago · r7s8t9u</td>
+                <td><span class="badge badge-success"><span class="status-dot dot-success"
+                      style="display:inline-block;margin-right:3px;"></span>Deployed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_r7s8t9')">Deploy</button></td>
+              </tr>
+              <tr data-env="production" onclick="openProjectDrawer('proj_007')">
+                <td>
+                  <div class="td-primary">notification-worker</div>
+                  <div class="td-mono">github: user/notification-worker</div>
+                </td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">notif.nexgenhost.com</td>
+                <td class="td-mono">1d ago · v1w2x3y</td>
+                <td><span class="badge badge-success"><span class="status-dot dot-success"
+                      style="display:inline-block;margin-right:3px;"></span>Deployed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_v1w2x3')">Deploy</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: DEPLOYMENTS
+    ════════════════════════════ -->
+      <section class="page" id="page-deployments">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Deployments</div>
+            <div class="page-subtitle">Full deployment history · All projects</div>
+          </div>
+          <div class="page-actions">
+            <input type="text" class="search-input" placeholder="Search deployments..." id="deploy-search">
+            <button class="btn btn-primary" onclick="startNewDeploy()">⚡ Deploy Now</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <span class="filter-label">Status:</span>
+          <button class="filter-btn active" onclick="setDeployFilter('all', this)">All</button>
+          <button class="filter-btn" onclick="setDeployFilter('success', this)">✓ Success</button>
+          <button class="filter-btn" onclick="setDeployFilter('building', this)">⟳ Building</button>
+          <button class="filter-btn" onclick="setDeployFilter('failed', this)">✗ Failed</button>
+          <span class="filter-label" style="margin-left:8px;">Env:</span>
+          <button class="filter-btn active" onclick="setDeployFilter('all', this)">All</button>
+          <button class="filter-btn" onclick="setDeployFilter('production', this)">Production</button>
+          <button class="filter-btn" onclick="setDeployFilter('staging', this)">Staging</button>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Deployment History</div>
+            <div class="panel-meta">Showing 1–7 of 28 this month</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Deploy ID</th>
+                <th>Project</th>
+                <th>Commit</th>
+                <th>Environment</th>
+                <th>Duration</th>
+                <th>Deployed At</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="openDeployDrawer('dep_a1b2c3')">
+                <td class="td-mono">dep_a1b2c3</td>
+                <td class="td-primary">e-commerce-api</td>
+                <td class="td-mono">a1b2c3d</td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">1m 42s</td>
+                <td class="td-mono">Jun 23 · 15:12</td>
+                <td><span class="badge badge-success">✓ Success</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_a1b2c3')">Logs →</button></td>
+              </tr>
+              <tr onclick="openDeployDrawer('dep_d4e5f6')">
+                <td class="td-mono">dep_d4e5f6</td>
+                <td class="td-primary">mobile-backend</td>
+                <td class="td-mono">d4e5f6g</td>
+                <td><span class="badge badge-staging">Staging</span></td>
+                <td class="td-mono">— building</td>
+                <td class="td-mono">Jun 23 · 14:59</td>
+                <td><span class="badge badge-warning">⟳ Building</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_d4e5f6')">Logs →</button></td>
+              </tr>
+              <tr onclick="openDeployDrawer('dep_h7i8j9')">
+                <td class="td-mono">dep_h7i8j9</td>
+                <td class="td-primary">blog-platform</td>
+                <td class="td-mono">h7i8j9k</td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">0m 58s</td>
+                <td class="td-mono">Jun 23 · 14:14</td>
+                <td><span class="badge badge-success">✓ Success</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_h7i8j9')">Logs →</button></td>
+              </tr>
+              <tr onclick="openDeployDrawer('dep_k1l2m3')">
+                <td class="td-mono">dep_k1l2m3</td>
+                <td class="td-primary">analytics-service</td>
+                <td class="td-mono">k1l2m3n</td>
+                <td><span class="badge badge-staging">Staging</span></td>
+                <td class="td-mono">3m 12s</td>
+                <td class="td-mono">Jun 23 · 12:02</td>
+                <td><span class="badge badge-danger">✗ Failed</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_k1l2m3')">Logs →</button></td>
+              </tr>
+              <tr onclick="openDeployDrawer('dep_n4o5p6')">
+                <td class="td-mono">dep_n4o5p6</td>
+                <td class="td-primary">payment-gateway</td>
+                <td class="td-mono">n4o5p6q</td>
+                <td><span class="badge badge-success">Production</span></td>
+                <td class="td-mono">2m 07s</td>
+                <td class="td-mono">Jun 23 · 10:45</td>
+                <td><span class="badge badge-success">✓ Success</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="event.stopPropagation();openDeployDrawer('dep_n4o5p6')">Logs →</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: DATABASES
+    ════════════════════════════ -->
+      <section class="page" id="page-databases">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Databases</div>
+            <div class="page-subtitle">8 managed databases · Lagos region</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-new-db')">+ New Database</button>
+          </div>
+        </div>
+
+        <div class="notice notice-info" style="margin-bottom:4px;">
+          ℹ️ &nbsp; All databases are hosted in <strong>af-south-1 (Lagos, Nigeria)</strong> — data never leaves African
+          soil. Automated daily backups included.
+        </div>
+
+        <div class="grid-3">
+          <div class="db-card" onclick="openDbDrawer('db_001')">
+            <div class="db-card-header">
+              <span class="db-icon">🐘</span>
+              <div>
+                <div class="db-name">pg-ecommerce-prod</div>
+                <div class="db-type">PostgreSQL 16 · Production</div>
+              </div>
+              <span class="badge badge-success" style="margin-left:auto;">Healthy</span>
+            </div>
+            <div class="db-stats">
+              <div>
+                <div class="db-stat-label">Storage</div>
+                <div class="db-stat-value">4.2 GB / 20 GB</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Connections</div>
+                <div class="db-stat-value">12 / 100</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Queries/sec</div>
+                <div class="db-stat-value">142</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Avg Latency</div>
+                <div class="db-stat-value">2.1 ms</div>
+              </div>
+            </div>
+            <div class="progress-bar" style="margin-top:10px;">
+              <div class="progress-fill" style="width:21%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--ink4);margin-top:4px;">21% storage used</div>
+          </div>
+
+          <div class="db-card" onclick="openDbDrawer('db_002')">
+            <div class="db-card-header">
+              <span class="db-icon">🔴</span>
+              <div>
+                <div class="db-name">redis-queue-prod</div>
+                <div class="db-type">Redis 7 · Production</div>
+              </div>
+              <span class="badge badge-success" style="margin-left:auto;">Healthy</span>
+            </div>
+            <div class="db-stats">
+              <div>
+                <div class="db-stat-label">Memory</div>
+                <div class="db-stat-value">180 MB / 512 MB</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Keys</div>
+                <div class="db-stat-value">2,841</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Ops/sec</div>
+                <div class="db-stat-value">4,200</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Queue Depth</div>
+                <div class="db-stat-value">14 jobs</div>
+              </div>
+            </div>
+            <div class="progress-bar" style="margin-top:10px;">
+              <div class="progress-fill" style="width:35%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--ink4);margin-top:4px;">35% memory used</div>
+          </div>
+
+          <div class="db-card" onclick="openDbDrawer('db_003')">
+            <div class="db-card-header">
+              <span class="db-icon">🐘</span>
+              <div>
+                <div class="db-name">pg-analytics-staging</div>
+                <div class="db-type">PostgreSQL 16 · Staging</div>
+              </div>
+              <span class="badge badge-warning" style="margin-left:auto;">High Load</span>
+            </div>
+            <div class="db-stats">
+              <div>
+                <div class="db-stat-label">Storage</div>
+                <div class="db-stat-value">8.9 GB / 10 GB</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Connections</div>
+                <div class="db-stat-value">88 / 100</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Queries/sec</div>
+                <div class="db-stat-value">891</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Avg Latency</div>
+                <div class="db-stat-value">18.4 ms</div>
+              </div>
+            </div>
+            <div class="progress-bar" style="margin-top:10px;">
+              <div class="progress-fill danger" style="width:89%"></div>
+            </div>
+            <div style="font-size:10px;color:var(--danger);margin-top:4px;">89% storage — upgrade recommended</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: DOMAINS
+    ════════════════════════════ -->
+      <section class="page" id="page-domains">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Domains</div>
+            <div class="page-subtitle">8 domains configured · 6 active SSL</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-new-domain')">+ Add Domain</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Custom Domains</div>
+            <div class="panel-meta">Let's Encrypt · Auto-renew enabled</div>
+          </div>
+          <div class="domain-row">
+            <div class="domain-info">
+              <div class="domain-name">api.nexgenhost.com</div>
+              <div class="domain-project">→ e-commerce-api · Production</div>
+            </div>
+            <span class="badge badge-success">✓ SSL Active</span>
+            <span class="badge badge-success">DNS OK</span>
+            <div class="domain-actions">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('info','🔒 SSL certificate valid until Sep 22, 2026')">Details</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('warning','⚠️ Domain removal requires confirmation')">Remove</button>
+            </div>
+          </div>
+          <div class="domain-row">
+            <div class="domain-info">
+              <div class="domain-name">mobile-api.nexgenhost.com</div>
+              <div class="domain-project">→ mobile-backend · Staging</div>
+            </div>
+            <span class="badge badge-success">✓ SSL Active</span>
+            <span class="badge badge-success">DNS OK</span>
+            <div class="domain-actions">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('info','🔒 SSL valid until Oct 5, 2026')">Details</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">Remove</button>
+            </div>
+          </div>
+          <div class="domain-row">
+            <div class="domain-info">
+              <div class="domain-name">pay.nexgenhost.com</div>
+              <div class="domain-project">→ payment-gateway · Production</div>
+            </div>
+            <span class="badge badge-success">✓ SSL Active</span>
+            <span class="badge badge-success">DNS OK</span>
+            <div class="domain-actions">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">Details</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">Remove</button>
+            </div>
+          </div>
+          <div class="domain-row">
+            <div class="domain-info">
+              <div class="domain-name">analytics.johndoe.dev</div>
+              <div class="domain-project">→ analytics-service · Staging</div>
+            </div>
+            <span class="badge badge-warning">⟳ Provisioning</span>
+            <span class="badge badge-warning">Pending DNS</span>
+            <div class="domain-actions">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('warning','⟳ Add CNAME: nexgenhost.com in your DNS provider')">DNS Help</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">Remove</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Wildcard info -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Wildcard Subdomains</div>
+            <div class="panel-meta">Auto-assigned on deploy</div>
+          </div>
+          <div style="padding:16px 20px;">
+            <div class="notice notice-info" style="margin-bottom:12px;">
+              🔗 &nbsp; All projects get a free subdomain at <strong>*.nexgenhost.com</strong>. Custom domains can be
+              pointed via CNAME.
+            </div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Auto Subdomain</th>
+                  <th>Project</th>
+                  <th>SSL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-mono">e-commerce-api.nexgenhost.com</td>
+                  <td>e-commerce-api</td>
+                  <td><span class="badge badge-success">✓ Active</span></td>
+                </tr>
+                <tr>
+                  <td class="td-mono">mobile-backend.nexgenhost.com</td>
+                  <td>mobile-backend</td>
+                  <td><span class="badge badge-success">✓ Active</span></td>
+                </tr>
+                <tr>
+                  <td class="td-mono">blog-platform.nexgenhost.com</td>
+                  <td>blog-platform</td>
+                  <td><span class="badge badge-success">✓ Active</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: BILLING
+    ════════════════════════════ -->
+      <section class="page" id="page-billing">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Billing & Plans</div>
+            <div class="page-subtitle">Powered by Paystack · NGN pricing</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-secondary" onclick="showToast('info','📄 Downloading invoice...')">📄
+              Invoice</button>
+            <button class="btn btn-ghost" onclick="showToast('success','🔗 Billing portal opened')">Manage
+              Payment</button>
+          </div>
+        </div>
+
+        <div class="notice notice-warning">
+          ⚠️ &nbsp; Your Pro Plan renews on <strong>Jul 15, 2026</strong>. Bandwidth at 64% — consider upgrading to
+          avoid overage charges.
+        </div>
+
+        <!-- Current plan banner -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Current Plan</div>
+            <div class="panel-meta">Renews Jul 15, 2026</div>
+          </div>
+          <div style="padding:20px;display:flex;align-items:center;gap:24px;">
+            <div>
+              <div
+                style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">
+                Active Plan</div>
+              <div style="font-size:22px;font-weight:700;color:var(--ink);">Pro Plan</div>
+              <div style="font-size:28px;font-weight:700;color:var(--accent);margin-top:2px;">₦15,000 <span
+                  style="font-size:13px;font-weight:400;color:var(--ink4);">/ month</span></div>
+            </div>
+            <div
+              style="flex:1;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;border-left:1px solid var(--border);padding-left:24px;">
+              <div>
+                <div class="db-stat-label">Projects</div>
+                <div style="font-size:15px;font-weight:600;color:var(--ink);">12 / 20</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Bandwidth</div>
+                <div style="font-size:15px;font-weight:600;color:var(--warning);">128 / 200 GB</div>
+              </div>
+              <div>
+                <div class="db-stat-label">Databases</div>
+                <div style="font-size:15px;font-weight:600;color:var(--ink);">8 / 10</div>
+              </div>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('success','🔼 Upgrading to Business plan...')">Upgrade
+              Plan</button>
+          </div>
+        </div>
+
+        <!-- Plan cards -->
+        <div class="plan-cards">
+          <div class="plan-card">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">₦5,000 <span>/ mo</span></div>
+            <div class="plan-features">
+              <div class="plan-feature">5 projects</div>
+              <div class="plan-feature">50 GB bandwidth</div>
+              <div class="plan-feature">2 databases</div>
+              <div class="plan-feature">Shared worker node</div>
+              <div class="plan-feature">Community support</div>
+            </div>
+            <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:14px;">Downgrade</button>
+          </div>
+
+          <div class="plan-card current">
+            <div class="plan-badge">CURRENT</div>
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">₦15,000 <span>/ mo</span></div>
+            <div class="plan-features">
+              <div class="plan-feature">20 projects</div>
+              <div class="plan-feature">200 GB bandwidth</div>
+              <div class="plan-feature">10 databases</div>
+              <div class="plan-feature">Dedicated worker node</div>
+              <div class="plan-feature">Priority support</div>
+              <div class="plan-feature">Custom domains</div>
+            </div>
+            <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:14px;"
+              disabled>Current Plan</button>
+          </div>
+
+          <div class="plan-card">
+            <div class="plan-name">Business</div>
+            <div class="plan-price">₦45,000 <span>/ mo</span></div>
+            <div class="plan-features">
+              <div class="plan-feature">Unlimited projects</div>
+              <div class="plan-feature">1 TB bandwidth</div>
+              <div class="plan-feature">30 databases</div>
+              <div class="plan-feature">Multi-node cluster</div>
+              <div class="plan-feature">24/7 SLA support</div>
+              <div class="plan-feature">Custom domains + wildcard</div>
+              <div class="plan-feature">Team collaboration</div>
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:14px;"
+              onclick="showToast('success','🔼 Redirecting to Paystack checkout...')">Upgrade →</button>
+          </div>
+        </div>
+
+        <!-- Invoice history -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Invoice History</div>
+            <div class="panel-meta">Paystack · Auto-billed</div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Invoice ID</th>
+                <th>Date</th>
+                <th>Plan</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="td-mono">INV-2026-06</td>
+                <td class="td-mono">Jun 15, 2026</td>
+                <td>Pro Plan</td>
+                <td class="td-mono">₦15,000</td>
+                <td><span class="badge badge-success">Paid</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="showToast('info','📄 Downloading invoice...')">PDF</button></td>
+              </tr>
+              <tr>
+                <td class="td-mono">INV-2026-05</td>
+                <td class="td-mono">May 15, 2026</td>
+                <td>Pro Plan</td>
+                <td class="td-mono">₦15,000</td>
+                <td><span class="badge badge-success">Paid</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="showToast('info','📄 Downloading invoice...')">PDF</button></td>
+              </tr>
+              <tr>
+                <td class="td-mono">INV-2026-04</td>
+                <td class="td-mono">Apr 15, 2026</td>
+                <td>Starter Plan</td>
+                <td class="td-mono">₦5,000</td>
+                <td><span class="badge badge-success">Paid</span></td>
+                <td><button class="btn btn-ghost" style="padding:3px 10px;font-size:11px;"
+                    onclick="showToast('info','📄 Downloading invoice...')">PDF</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: API KEYS
+    ════════════════════════════ -->
+      <section class="page" id="page-apikeys">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">API Keys</div>
+            <div class="page-subtitle">Manage access tokens for your projects and integrations</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" onclick="openModal('modal-new-key')">+ Generate Key</button>
+          </div>
+        </div>
+
+        <div class="notice notice-warning">
+          🔐 &nbsp; Keep your API keys secret. Never expose them in client-side code or public repositories. Rotate keys
+          regularly.
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Active API Keys</div>
+            <div class="panel-meta">3 keys · All scoped</div>
+          </div>
+          <div class="api-key-row">
+            <div class="api-key-icon">🔑</div>
+            <div class="api-key-info">
+              <div class="api-key-name">Production API Key</div>
+              <div class="api-key-value">ngx_prod_••••••••••••••••••••••••••••••3f2a</div>
+              <div class="api-key-meta">Created Jun 1 · Last used 2 mins ago · Scopes: deploy, read</div>
+            </div>
+            <span class="badge badge-success">Active</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('success','📋 Key copied to clipboard')">Copy</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('warning','⚠️ Confirm revocation in dialog')">Revoke</button>
+            </div>
+          </div>
+          <div class="api-key-row">
+            <div class="api-key-icon">🔑</div>
+            <div class="api-key-info">
+              <div class="api-key-name">GitHub Actions CI Key</div>
+              <div class="api-key-value">ngx_ci_••••••••••••••••••••••••••••••8b1c</div>
+              <div class="api-key-meta">Created May 20 · Last used 15m ago · Scopes: deploy</div>
+            </div>
+            <span class="badge badge-success">Active</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('success','📋 Key copied to clipboard')">Copy</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">Revoke</button>
+            </div>
+          </div>
+          <div class="api-key-row">
+            <div class="api-key-icon">🔑</div>
+            <div class="api-key-info">
+              <div class="api-key-name">Read-Only Analytics Key</div>
+              <div class="api-key-value">ngx_ro_••••••••••••••••••••••••••••••a92d</div>
+              <div class="api-key-meta">Created Apr 10 · Last used 3 days ago · Scopes: read</div>
+            </div>
+            <span class="badge badge-muted">Inactive</span>
+            <div style="display:flex;gap:6px;">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('success','📋 Key copied to clipboard')">Copy</button>
+              <button class="btn btn-danger" style="padding:4px 10px;font-size:11px;">Revoke</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Webhooks -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Webhooks</div>
+            <div class="panel-actions">
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('info','+ Adding webhook endpoint...')">+ Add Webhook</button>
+            </div>
+          </div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Endpoint</th>
+                <th>Events</th>
+                <th>Last Triggered</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr onclick="showToast('info','🔗 Webhook details panel coming soon')">
+                <td class="td-mono">https://hooks.johndoe.dev/nexgen</td>
+                <td><span class="badge badge-muted">deploy.success</span> <span
+                    class="badge badge-muted">deploy.failed</span></td>
+                <td class="td-mono">2m ago</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+              <tr onclick="showToast('info','🔗 Webhook details panel coming soon')">
+                <td class="td-mono">https://slack.com/hooks/T04xxx/Byyy</td>
+                <td><span class="badge badge-muted">deploy.failed</span></td>
+                <td class="td-mono">3h ago</td>
+                <td><span class="badge badge-success">Active</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: SETTINGS
+    ════════════════════════════ -->
+      <section class="page" id="page-settings">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Settings</div>
+            <div class="page-subtitle">Account, team, and platform preferences</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Account settings -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Account Information</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Full Name</div>
+                <div class="setting-desc">John Doe</div>
+              </div>
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('info','✏️ Edit profile modal...')">Edit</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Email Address</div>
+                <div class="setting-desc">john@example.com</div>
+              </div>
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;">Change</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Password</div>
+                <div class="setting-desc">Last changed 30 days ago</div>
+              </div>
+              <button class="btn btn-ghost" style="padding:4px 10px;font-size:11px;"
+                onclick="showToast('info','🔐 Password change email sent')">Reset</button>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Two-Factor Auth (2FA)</div>
+                <div class="setting-desc">Extra security for your account</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle on"></div>
+                <span style="font-size:11px;color:var(--accent);">Enabled</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notification settings -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title">Notifications</div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Deployment Success</div>
+                <div class="setting-desc">Email on every successful deploy</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle on"></div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Deployment Failures</div>
+                <div class="setting-desc">Immediate alert on deploy failure</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle on"></div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Usage Alerts</div>
+                <div class="setting-desc">Notify at 80% resource usage</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle on"></div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Billing Reminders</div>
+                <div class="setting-desc">7 days before renewal</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle"></div>
+              </div>
+            </div>
+            <div class="setting-row">
+              <div class="setting-info">
+                <div class="setting-label">Security Alerts</div>
+                <div class="setting-desc">New login & API key usage</div>
+              </div>
+              <div class="toggle-wrap" onclick="toggleSwitch(this)">
+                <div class="toggle on"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Team Members -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Team Members</div>
+            <div class="panel-actions">
+              <button class="btn btn-primary" style="padding:5px 12px;font-size:11px;"
+                onclick="showToast('info','✉️ Invite link copied — send to team member')">+ Invite Member</button>
+            </div>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);">JD</div>
+            <div class="member-info">
+              <div class="member-name">John Doe <span class="badge badge-success" style="margin-left:4px;">You</span>
+              </div>
+              <div class="member-email">john@example.com</div>
+            </div>
+            <span class="badge badge-info">Owner</span>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#059669,#10b981);">AO</div>
+            <div class="member-info">
+              <div class="member-name">Amaka Okonkwo</div>
+              <div class="member-email">amaka@example.com</div>
+            </div>
+            <span class="badge badge-staging">Developer</span>
+            <button class="btn btn-danger" style="padding:3px 10px;font-size:11px;margin-left:8px;"
+              onclick="showToast('warning','⚠️ Remove member?')">Remove</button>
+          </div>
+          <div class="member-row">
+            <div class="member-avatar" style="background:linear-gradient(135deg,#d97706,#f59e0b);">CB</div>
+            <div class="member-info">
+              <div class="member-name">Chukwuemeka Bello</div>
+              <div class="member-email">emeka@example.com</div>
+            </div>
+            <span class="badge badge-muted">Viewer</span>
+            <button class="btn btn-danger" style="padding:3px 10px;font-size:11px;margin-left:8px;"
+              onclick="showToast('warning','⚠️ Remove member?')">Remove</button>
+          </div>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="panel" style="border-color:rgba(239,68,68,0.2);">
+          <div class="panel-header" style="background:rgba(239,68,68,0.05);">
+            <div class="panel-title" style="color:var(--danger);">⚠️ Danger Zone</div>
+          </div>
+          <div class="setting-row">
+            <div class="setting-info">
+              <div class="setting-label">Delete Account</div>
+              <div class="setting-desc">Permanently delete account and all projects. This cannot be undone.</div>
+            </div>
+            <button class="btn btn-danger"
+              onclick="showToast('danger','💀 Type DELETE to confirm account deletion')">Delete Account</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ════════════════════════════
+         PAGE: ACTIVITY LOG
+    ════════════════════════════ -->
+      <section class="page" id="page-activity">
+        <div class="page-header">
+          <div class="page-title-block">
+            <div class="page-title">Activity Log</div>
+            <div class="page-subtitle">All platform events · Audit trail</div>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-ghost" onclick="showToast('info','📤 Exporting audit log...')">⬇ Export Log</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Recent Activity</div>
+            <div class="panel-meta">Showing last 20 events</div>
+          </div>
+          <div class="timeline" style="padding:0 20px;" id="activity-log">
+            <!-- populated by JS -->
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- ══════════════════════════════
+     DEPLOYMENT DETAIL DRAWER
+══════════════════════════════ -->
+  <div class="drawer-backdrop" id="deploy-backdrop" onclick="closeDrawer('deploy-drawer')"></div>
+  <div class="drawer" id="deploy-drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawer-deploy-title">Deployment Details</div>
+        <div class="drawer-subtitle" id="drawer-deploy-id">dep_a1b2c3</div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer('deploy-drawer')">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- Meta -->
+      <div>
+        <div class="drawer-section-title">Deployment Info</div>
+        <div class="drawer-grid" id="drawer-deploy-meta">
+          <div class="drawer-field">
+            <div class="df-label">Project</div>
+            <div class="df-val">e-commerce-api</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Environment</div>
+            <div class="df-val"><span class="badge badge-success">Production</span></div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Commit</div>
+            <div class="df-val mono">a1b2c3d</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Branch</div>
+            <div class="df-val mono">main</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Duration</div>
+            <div class="df-val">1m 42s</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Status</div>
+            <div class="df-val"><span class="badge badge-success">✓ Success</span></div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Deployed By</div>
+            <div class="df-val">John Doe (auto)</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Live URL</div>
+            <div class="df-val mono" style="color:var(--accent);">api.nexgenhost.com</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Deploy steps -->
+      <div>
+        <div class="drawer-section-title">Build Steps</div>
+        <div class="deploy-steps" id="drawer-deploy-steps">
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Clone repository from GitHub</div>
+            <div class="step-time">0.8s</div>
+          </div>
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Build Docker image (node:20-alpine)</div>
+            <div class="step-time">48.2s</div>
+          </div>
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Push image to container registry</div>
+            <div class="step-time">12.1s</div>
+          </div>
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Start container on worker node</div>
+            <div class="step-time">3.4s</div>
+          </div>
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Health check passed</div>
+            <div class="step-time">1.2s</div>
+          </div>
+          <div class="deploy-step">
+            <div class="step-indicator step-done">✓</div>
+            <div class="step-label">Update DNS & SSL routing</div>
+            <div class="step-time">0.4s</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live logs -->
+      <div>
+        <div class="drawer-section-title" style="display:flex;align-items:center;justify-content:space-between;">
+          <span>Build Logs</span>
+          <button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;" onclick="streamLogs()">▶ Stream</button>
+        </div>
+        <div class="log-terminal" id="deploy-logs">
+          <div class="log-line"><span class="log-time">15:12:01</span><span class="log-muted">Initializing deployment
+              dep_a1b2c3...</span></div>
+          <div class="log-line"><span class="log-time">15:12:01</span><span class="log-info">→ Cloning
+              github.com/user/e-commerce-api@main</span></div>
+          <div class="log-line"><span class="log-time">15:12:02</span><span class="log-success">✓ Repository cloned
+              successfully (823ms)</span></div>
+          <div class="log-line"><span class="log-time">15:12:02</span><span class="log-info">→ Building Docker image:
+              node:20-alpine</span></div>
+          <div class="log-line"><span class="log-time">15:12:10</span><span class="log-muted">Step 1/8: FROM
+              node:20-alpine</span></div>
+          <div class="log-line"><span class="log-time">15:12:12</span><span class="log-muted">Step 2/8: WORKDIR
+              /app</span></div>
+          <div class="log-line"><span class="log-time">15:12:12</span><span class="log-muted">Step 3/8: COPY
+              package*.json ./</span></div>
+          <div class="log-line"><span class="log-time">15:12:12</span><span class="log-muted">Step 4/8: RUN npm ci
+              --only=production</span></div>
+          <div class="log-line"><span class="log-time">15:12:48</span><span class="log-success">✓ npm install complete
+              (36.2s)</span></div>
+          <div class="log-line"><span class="log-time">15:12:50</span><span class="log-success">✓ Docker image built
+              successfully</span></div>
+          <div class="log-line"><span class="log-time">15:12:50</span><span class="log-info">→ Starting container on
+              worker-node-1 (Lagos)</span></div>
+          <div class="log-line"><span class="log-time">15:12:53</span><span class="log-success">✓ Container started ·
+              Port 3000 exposed</span></div>
+          <div class="log-line"><span class="log-time">15:12:54</span><span class="log-success">✓ Health check passed ·
+              HTTP 200 OK</span></div>
+          <div class="log-line"><span class="log-time">15:12:54</span><span class="log-success">✓ Deployment successful!
+              🎉</span></div>
+          <div class="log-line"><span class="log-time">15:12:54</span><span class="log-success">→ Live at:
+              https://api.nexgenhost.com</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-primary" style="flex:1;justify-content:center;"
+        onclick="showToast('info','⚡ Re-deploying latest commit...');closeDrawer('deploy-drawer')">⚡ Redeploy</button>
+      <button class="btn btn-secondary" style="flex:1;justify-content:center;"
+        onclick="showToast('warning','⏮️ Rolling back to previous version...');closeDrawer('deploy-drawer')">⏮️ Rollback</button>
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+        onclick="closeDrawer('deploy-drawer')">Close</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     PROJECT DETAIL DRAWER
+══════════════════════════════ -->
+  <div class="drawer-backdrop" id="project-backdrop" onclick="closeDrawer('project-drawer')"></div>
+  <div class="drawer" id="project-drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawer-project-title">e-commerce-api</div>
+        <div class="drawer-subtitle">Project Details · github.com/user/e-commerce-api</div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer('project-drawer')">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div>
+        <div class="drawer-section-title">Project Settings</div>
+        <div class="drawer-grid">
+          <div class="drawer-field">
+            <div class="df-label">Runtime</div>
+            <div class="df-val">Node.js 20</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Region</div>
+            <div class="df-val">af-south-1 (Lagos)</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Build Command</div>
+            <div class="df-val mono">npm run build</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Start Command</div>
+            <div class="df-val mono">npm start</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Port</div>
+            <div class="df-val mono">3000</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Auto-Deploy</div>
+            <div class="df-val">✓ On push to main</div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">Environment Variables</div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Key</th>
+              <th>Value</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="td-mono">NODE_ENV</td>
+              <td class="td-mono">production</td>
+              <td><button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;">Edit</button></td>
+            </tr>
+            <tr>
+              <td class="td-mono">DATABASE_URL</td>
+              <td class="td-mono">••••••••••••••••••</td>
+              <td><button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;">Edit</button></td>
+            </tr>
+            <tr>
+              <td class="td-mono">PAYSTACK_KEY</td>
+              <td class="td-mono">••••••••••••••••••</td>
+              <td><button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;">Edit</button></td>
+            </tr>
+            <tr>
+              <td class="td-mono">REDIS_URL</td>
+              <td class="td-mono">••••••••••••••••••</td>
+              <td><button class="btn btn-ghost" style="padding:2px 8px;font-size:10px;">Edit</button></td>
+            </tr>
+          </tbody>
+        </table>
+        <button class="btn btn-ghost" style="margin-top:8px;font-size:11px;"
+          onclick="showToast('info','+ Adding env var...')">+ Add Variable</button>
+      </div>
+
+      <div>
+        <div class="drawer-section-title">Recent Deployments</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-dot-col">
+              <div class="t-dot success"></div>
+              <div class="timeline-line"></div>
+            </div>
+            <div class="t-content">
+              <div class="t-title">Deploy dep_a1b2c3 — Success</div>
+              <div class="t-desc">Fix cart total rounding · main@a1b2c3d</div>
+              <div class="t-time">Jun 23 · 15:12</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot-col">
+              <div class="t-dot success"></div>
+              <div class="timeline-line"></div>
+            </div>
+            <div class="t-content">
+              <div class="t-title">Deploy dep_z9y8x7 — Success</div>
+              <div class="t-desc">Add inventory webhook · main@z9y8x7w</div>
+              <div class="t-time">Jun 22 · 10:04</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-dot-col">
+              <div class="t-dot danger"></div>
+            </div>
+            <div class="t-content">
+              <div class="t-title">Deploy dep_w6v5u4 — Failed</div>
+              <div class="t-desc">Out-of-memory during image build</div>
+              <div class="t-time">Jun 21 · 18:30</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-primary" style="flex:1;justify-content:center;"
+        onclick="startNewDeploy();closeDrawer('project-drawer')">⚡ Deploy</button>
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+        onclick="showToast('info','⚙️ Opening project settings...')">Settings</button>
+      <button class="btn btn-danger" style="flex:1;justify-content:center;"
+        onclick="showToast('danger','🗑️ Confirm project deletion')">Delete</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     DB DETAIL DRAWER
+══════════════════════════════ -->
+  <div class="drawer-backdrop" id="db-backdrop" onclick="closeDrawer('db-drawer')"></div>
+  <div class="drawer" id="db-drawer">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="drawer-db-title">pg-ecommerce-prod</div>
+        <div class="drawer-subtitle">PostgreSQL 16 · af-south-1 · Production</div>
+      </div>
+      <button class="drawer-close" onclick="closeDrawer('db-drawer')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div>
+        <div class="drawer-section-title">Connection Details</div>
+        <div class="drawer-grid">
+          <div class="drawer-field">
+            <div class="df-label">Host</div>
+            <div class="df-val mono">pg-prod.lagos.nexgenhost.com</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Port</div>
+            <div class="df-val mono">5432</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Database</div>
+            <div class="df-val mono">ecommerce_prod</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">User</div>
+            <div class="df-val mono">ngx_user</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">SSL Mode</div>
+            <div class="df-val">require</div>
+          </div>
+          <div class="drawer-field">
+            <div class="df-label">Version</div>
+            <div class="df-val">PostgreSQL 16.2</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" style="margin-top:8px;font-size:11px;"
+          onclick="showToast('success','📋 Connection string copied!')">Copy Connection String</button>
+      </div>
+      <div>
+        <div class="drawer-section-title">Current Metrics</div>
+        <div class="usage-item">
+          <div class="usage-header"><span class="usage-label">Storage</span><span class="usage-value">4.2 / 20 GB</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:21%"></div>
+          </div>
+        </div>
+        <div class="usage-item">
+          <div class="usage-header"><span class="usage-label">Connections</span><span class="usage-value">12 /
+              100</span></div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:12%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn btn-primary" style="flex:1;justify-content:center;"
+        onclick="showToast('success','✓ Backup triggered')">🗃 Backup Now</button>
+      <button class="btn btn-ghost" style="flex:1;justify-content:center;"
+        onclick="closeDrawer('db-drawer')">Close</button>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     MODAL: NEW PROJECT
+══════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-new-project" onclick="closeModalOnBackdrop(event, this)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create New Project</div>
+        <button class="modal-close" onclick="closeModal('modal-new-project')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Project Name</label>
+          <input type="text" class="form-input" placeholder="e.g. my-api-service" id="new-project-name">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Runtime</label>
+            <select class="form-select">
+              <option>Node.js 20</option>
+              <option>Node.js 18</option>
+              <option>Python 3.12</option>
+              <option>Go 1.22</option>
+              <option>PHP 8.3</option>
+              <option>Docker (custom)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Region</label>
+            <select class="form-select">
+              <option>🇳🇬 Lagos (af-south-1)</option>
+              <option disabled>🌍 Nairobi (af-east-1) — coming soon</option>
+              <option disabled>🇬🇭 Accra (af-west-1) — coming soon</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">GitHub Repository</label>
+          <input type="text" class="form-input" placeholder="https://github.com/username/repo">
+          <div class="form-hint">Connect your GitHub account to enable auto-deploy on push.</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Build Command</label>
+            <input type="text" class="form-input" value="npm run build">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Start Command</label>
+            <input type="text" class="form-input" value="npm start">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Environment</label>
+          <select class="form-select">
+            <option>Production</option>
+            <option>Staging</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-new-project')">Cancel</button>
+        <button class="btn btn-primary" onclick="createProject()">Create & Deploy →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     MODAL: NEW DATABASE
+══════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-new-db" onclick="closeModalOnBackdrop(event, this)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create New Database</div>
+        <button class="modal-close" onclick="closeModal('modal-new-db')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Database Name</label>
+          <input type="text" class="form-input" placeholder="e.g. pg-my-app-prod">
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Engine</label>
+            <select class="form-select">
+              <option>PostgreSQL 16</option>
+              <option>MySQL 8</option>
+              <option>Redis 7</option>
+              <option>MongoDB 7</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Plan</label>
+            <select class="form-select">
+              <option>Starter (1 GB)</option>
+              <option>Pro (10 GB)</option>
+              <option>Business (50 GB)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attach to Project</label>
+          <select class="form-select">
+            <option>e-commerce-api</option>
+            <option>mobile-backend</option>
+            <option>analytics-service</option>
+            <option>— None (standalone)</option>
+          </select>
+        </div>
+        <div class="notice notice-info" style="font-size:11px;">
+          🔒 Database will be provisioned in <strong>af-south-1 (Lagos)</strong> with daily automated backups and SSL
+          enforced.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-new-db')">Cancel</button>
+        <button class="btn btn-primary"
+          onclick="showToast('success','🗄️ Database provisioning... Ready in ~30s');closeModal('modal-new-db')">Provision
+          Database</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     MODAL: NEW DOMAIN
+══════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-new-domain" onclick="closeModalOnBackdrop(event, this)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add Custom Domain</div>
+        <button class="modal-close" onclick="closeModal('modal-new-domain')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Domain Name</label>
+          <input type="text" class="form-input" placeholder="e.g. api.yourdomain.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Attach to Project</label>
+          <select class="form-select">
+            <option>e-commerce-api</option>
+            <option>mobile-backend</option>
+            <option>blog-platform</option>
+            <option>payment-gateway</option>
+          </select>
+        </div>
+        <div class="notice notice-info" style="font-size:11px;">
+          📋 After adding, point your domain's <strong>CNAME</strong> record to <code
+            style="font-family:var(--font-mono);background:var(--surface3);padding:1px 4px;border-radius:3px;">cname.nexgenhost.com</code>.
+          SSL will provision automatically within 60s.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-new-domain')">Cancel</button>
+        <button class="btn btn-primary"
+          onclick="showToast('success','🌐 Domain added! Awaiting DNS propagation...');closeModal('modal-new-domain')">Add
+          Domain</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     MODAL: NEW API KEY
+══════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-new-key" onclick="closeModalOnBackdrop(event, this)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Generate API Key</div>
+        <button class="modal-close" onclick="closeModal('modal-new-key')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Key Name / Label</label>
+          <input type="text" class="form-input" placeholder="e.g. GitHub Actions CI">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Scopes</label>
+          <div
+            style="display:flex;flex-direction:column;gap:8px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);border:1px solid var(--border2);">
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"
+                checked> <span>deploy — Trigger and manage deployments</span></label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input type="checkbox"
+                checked> <span>read — Read project/deployment data</span></label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input
+                type="checkbox"> <span>write — Create/update projects</span></label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:12px;cursor:pointer;"><input
+                type="checkbox"> <span>billing — Access billing data</span></label>
+          </div>
+        </div>
+        <div class="notice notice-warning" style="font-size:11px;">
+          ⚠️ The key will only be shown <strong>once</strong>. Copy and store it securely immediately after generation.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal('modal-new-key')">Cancel</button>
+        <button class="btn btn-primary" onclick="generateKey()">Generate Key</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     MODAL: LIVE DEPLOY PROGRESS
+══════════════════════════════ -->
+  <div class="modal-backdrop" id="modal-deploy-progress" onclick="void(0)">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">⚡ Deploying...</div>
+        <div style="font-size:11px;color:var(--ink4)" id="deploy-progress-id">dep_live_xxxx</div>
+      </div>
+      <div class="modal-body">
+        <div class="deploy-steps" id="live-deploy-steps">
+          <div class="deploy-step" id="ls-0">
+            <div class="step-indicator step-pending" id="li-0">1</div>
+            <div class="step-label">Clone repository from GitHub</div>
+            <div class="step-time" id="lt-0"></div>
+          </div>
+          <div class="deploy-step" id="ls-1">
+            <div class="step-indicator step-pending" id="li-1">2</div>
+            <div class="step-label">Build Docker image</div>
+            <div class="step-time" id="lt-1"></div>
+          </div>
+          <div class="deploy-step" id="ls-2">
+            <div class="step-indicator step-pending" id="li-2">3</div>
+            <div class="step-label">Push image to registry</div>
+            <div class="step-time" id="lt-2"></div>
+          </div>
+          <div class="deploy-step" id="ls-3">
+            <div class="step-indicator step-pending" id="li-3">4</div>
+            <div class="step-label">Start container on worker node</div>
+            <div class="step-time" id="lt-3"></div>
+          </div>
+          <div class="deploy-step" id="ls-4">
+            <div class="step-indicator step-pending" id="li-4">5</div>
+            <div class="step-label">Health check</div>
+            <div class="step-time" id="lt-4"></div>
+          </div>
+          <div class="deploy-step" id="ls-5">
+            <div class="step-indicator step-pending" id="li-5">6</div>
+            <div class="step-label">Update DNS & route traffic</div>
+            <div class="step-time" id="lt-5"></div>
+          </div>
+        </div>
+
+        <div class="log-terminal" id="live-log" style="min-height:160px;max-height:200px;margin-top:4px;">
+          <div class="log-line"><span class="log-time" id="live-log-init"></span><span class="log-muted">Initializing
+              deployment job...</span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" id="close-deploy-modal" onclick="closeModal('modal-deploy-progress')"
+          disabled>Close (wait...)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════
+     TOAST CONTAINER
+══════════════════════════════ -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ══════════════════════════════
+     JAVASCRIPT
+══════════════════════════════ -->
+  <script>
+    /* ── LIVE CLOCK ──────────────────────────── */
+    function updateClock() {
+      const el = document.getElementById('live-time');
+      if (el) el.textContent = new Date().toLocaleString('en-NG', { dateStyle: 'short', timeStyle: 'short' });
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    /* ── PAGE NAVIGATION ─────────────────────── */
+    function switchPage(page) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+      const pg = document.getElementById('page-' + page);
+      if (pg) pg.classList.add('active');
+      const nav = document.getElementById('nav-' + page);
+      if (nav) nav.classList.add('active');
+      window.scrollTo(0, 0);
+      if (page === 'activity') populateActivity();
+    }
+
+    /* ── DRAWER OPEN/CLOSE ───────────────────── */
+    function openDrawer(id) {
+      document.getElementById(id).classList.add('open');
+      document.getElementById(id.replace('drawer', 'backdrop')).classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeDrawer(id) {
+      document.getElementById(id).classList.remove('open');
+      const bk = id.replace('drawer', 'backdrop');
+      const bd = document.getElementById(bk);
+      if (bd) bd.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    const DEPLOY_DATA = {
+      dep_a1b2c3: {
+        title: 'e-commerce-api · Production',
+        id: 'dep_a1b2c3',
+        status: 'success',
+        meta: [
+          ['Project', 'e-commerce-api'], ['Environment', '<span class="badge badge-success">Production</span>'],
+          ['Commit', '<span class="td-mono">a1b2c3d</span>'], ['Branch', '<span class="td-mono">main</span>'],
+          ['Duration', '1m 42s'], ['Status', '<span class="badge badge-success">✓ Success</span>'],
+          ['Deployed By', 'John Doe'], ['Live URL', '<span class="td-mono" style="color:var(--accent);">api.nexgenhost.com</span>'],
+        ],
+        steps: ['done', 'done', 'done', 'done', 'done', 'done'],
+      },
+      dep_d4e5f6: {
+        title: 'mobile-backend · Staging',
+        id: 'dep_d4e5f6',
+        status: 'building',
+        meta: [
+          ['Project', 'mobile-backend'], ['Environment', '<span class="badge badge-staging">Staging</span>'],
+          ['Commit', '<span class="td-mono">d4e5f6g</span>'], ['Branch', '<span class="td-mono">develop</span>'],
+          ['Duration', '—'], ['Status', '<span class="badge badge-warning">⟳ Building</span>'],
+          ['Deployed By', 'John Doe'], ['Live URL', '<span class="td-mono" style="color:var(--ink4);">pending...</span>'],
+        ],
+        steps: ['done', 'active', 'pending', 'pending', 'pending', 'pending'],
+      },
+      dep_h7i8j9: {
+        title: 'blog-platform · Production',
+        id: 'dep_h7i8j9',
+        status: 'success',
+        meta: [
+          ['Project', 'blog-platform'], ['Environment', '<span class="badge badge-success">Production</span>'],
+          ['Commit', '<span class="td-mono">h7i8j9k</span>'], ['Branch', '<span class="td-mono">main</span>'],
+          ['Duration', '0m 58s'], ['Status', '<span class="badge badge-success">✓ Success</span>'],
+          ['Deployed By', 'Auto (push)'], ['Live URL', '<span class="td-mono" style="color:var(--accent);">blog.nexgenhost.com</span>'],
+        ],
+        steps: ['done', 'done', 'done', 'done', 'done', 'done'],
+      },
+      dep_k1l2m3: {
+        title: 'analytics-service · Staging',
+        id: 'dep_k1l2m3',
+        status: 'failed',
+        meta: [
+          ['Project', 'analytics-service'], ['Environment', '<span class="badge badge-staging">Staging</span>'],
+          ['Commit', '<span class="td-mono">k1l2m3n</span>'], ['Branch', '<span class="td-mono">feature/metrics</span>'],
+          ['Duration', '3m 12s'], ['Status', '<span class="badge badge-danger">✗ Failed</span>'],
+          ['Deployed By', 'John Doe'], ['Error', '<span style="color:var(--danger);">OOM: Out of memory</span>'],
+        ],
+        steps: ['done', 'failed', 'pending', 'pending', 'pending', 'pending'],
+      },
+      dep_n4o5p6: {
+        title: 'payment-gateway · Production',
+        id: 'dep_n4o5p6',
+        status: 'success',
+        meta: [
+          ['Project', 'payment-gateway'], ['Environment', '<span class="badge badge-success">Production</span>'],
+          ['Commit', '<span class="td-mono">n4o5p6q</span>'], ['Branch', '<span class="td-mono">main</span>'],
+          ['Duration', '2m 07s'], ['Status', '<span class="badge badge-success">✓ Success</span>'],
+          ['Deployed By', 'Auto (push)'], ['Live URL', '<span class="td-mono" style="color:var(--accent);">pay.nexgenhost.com</span>'],
+        ],
+        steps: ['done', 'done', 'done', 'done', 'done', 'done'],
+      },
+    };
+
+    function openDeployDrawer(id) {
+      const d = DEPLOY_DATA[id] || DEPLOY_DATA['dep_a1b2c3'];
+      document.getElementById('drawer-deploy-title').textContent = d.title;
+      document.getElementById('drawer-deploy-id').textContent = d.id;
+
+      const metaEl = document.getElementById('drawer-deploy-meta');
+      metaEl.innerHTML = d.meta.map(([l, v]) =>
+        `<div class="drawer-field"><div class="df-label">${l}</div><div class="df-val">${v}</div></div>`
+      ).join('');
+
+      const stepLabels = ['Clone repository from GitHub', 'Build Docker image', 'Push image to registry', 'Start container on worker node', 'Health check passed', 'Update DNS & SSL routing'];
+      const stepTimes = ['0.8s', '48.2s', '12.1s', '3.4s', '1.2s', '0.4s'];
+      const stepsEl = document.getElementById('drawer-deploy-steps');
+      stepsEl.innerHTML = d.steps.map((st, i) => `
+    <div class="deploy-step">
+      <div class="step-indicator step-${st}">${st === 'done' ? '✓' : st === 'failed' ? '✗' : st === 'active' ? '⟳' : (i + 1)}</div>
+      <div class="step-label">${stepLabels[i]}</div>
+      <div class="step-time">${st === 'done' ? stepTimes[i] : st === 'failed' ? 'failed' : ''}</div>
+    </div>
+  `).join('');
+
+      // load appropriate logs
+      const logsEl = document.getElementById('deploy-logs');
+      if (d.status === 'failed') {
+        logsEl.innerHTML = `
+      <div class="log-line"><span class="log-time">12:02:00</span><span class="log-info">→ Cloning github.com/user/analytics-service</span></div>
+      <div class="log-line"><span class="log-time">12:02:01</span><span class="log-success">✓ Repository cloned</span></div>
+      <div class="log-line"><span class="log-time">12:02:01</span><span class="log-info">→ Building Docker image...</span></div>
+      <div class="log-line"><span class="log-time">12:05:12</span><span class="log-error">✗ ERROR: OOM killed — out of memory (limit: 512MB)</span></div>
+      <div class="log-line"><span class="log-time">12:05:12</span><span class="log-error">✗ Deployment failed. Consider upgrading to Pro plan for more memory.</span></div>
+    `;
+      } else if (d.status === 'building') {
+        logsEl.innerHTML = `
+      <div class="log-line"><span class="log-time">14:59:00</span><span class="log-info">→ Cloning github.com/user/mobile-backend</span></div>
+      <div class="log-line"><span class="log-time">14:59:01</span><span class="log-success">✓ Repository cloned (0.9s)</span></div>
+      <div class="log-line"><span class="log-time">14:59:02</span><span class="log-info">→ Building Docker image: node:20-alpine</span></div>
+      <div class="log-line"><span class="log-time">14:59:30</span><span class="log-muted">Step 4/8: RUN npm ci --only=production</span></div>
+      <div class="log-line"><span class="log-time">14:59:30</span><span class="log-warn">⟳ Building... (in progress)</span></div>
+    `;
+      } else {
+        logsEl.innerHTML = `
+      <div class="log-line"><span class="log-time">15:12:01</span><span class="log-info">→ Cloning repository...</span></div>
+      <div class="log-line"><span class="log-time">15:12:02</span><span class="log-success">✓ Repository cloned (823ms)</span></div>
+      <div class="log-line"><span class="log-time">15:12:02</span><span class="log-info">→ Building Docker image...</span></div>
+      <div class="log-line"><span class="log-time">15:12:50</span><span class="log-success">✓ Docker image built</span></div>
+      <div class="log-line"><span class="log-time">15:12:50</span><span class="log-info">→ Starting container on worker-node-1 (Lagos)</span></div>
+      <div class="log-line"><span class="log-time">15:12:53</span><span class="log-success">✓ Container started · Port 3000</span></div>
+      <div class="log-line"><span class="log-time">15:12:54</span><span class="log-success">✓ Health check passed</span></div>
+      <div class="log-line"><span class="log-time">15:12:54</span><span class="log-success">✓ Deployment successful! 🎉</span></div>
+    `;
+      }
+
+      openDrawer('deploy-drawer');
+    }
+
+    function openProjectDrawer(id) {
+      openDrawer('project-drawer');
+    }
+
+    function openDbDrawer(id) {
+      openDrawer('db-drawer');
+    }
+
+    /* ── MODAL OPEN/CLOSE ────────────────────── */
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) { m.classList.add('open'); document.body.style.overflow = 'hidden'; }
+    }
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) { m.classList.remove('open'); document.body.style.overflow = ''; }
+    }
+    function closeModalOnBackdrop(e, el) {
+      if (e.target === el) closeModal(el.id);
+    }
+
+    /* ── CREATE PROJECT ──────────────────────── */
+    function createProject() {
+      const name = document.getElementById('new-project-name').value.trim() || 'new-project';
+      closeModal('modal-new-project');
+      startNewDeploy(name);
+    }
+
+    /* ── LIVE DEPLOY SIMULATION ──────────────── */
+    const STEP_DURATIONS = [1200, 4000, 1800, 1500, 800, 600];
+    const STEP_LABELS_LOG = [
+      ['Initializing job...', '→ Cloning repository from GitHub', '✓ Repository cloned successfully'],
+      ['→ Building Docker image (node:20-alpine)', 'Step 3/8: RUN npm ci', '✓ Docker image built successfully'],
+      ['→ Pushing image to container registry', '✓ Image pushed (sha256:a1b2c3...)'],
+      ['→ Dispatching to worker-node-1 (Lagos)', '✓ Container started · Port 3000'],
+      ['→ Running health checks...', '✓ HTTP 200 OK — Health check passed'],
+      ['→ Updating DNS & routing rules', '✓ Deployment complete! 🎉', '→ Live at: https://app.nexgenhost.com'],
+    ];
+
+    function startNewDeploy(name) {
+      const depId = 'dep_live_' + Math.random().toString(36).substr(2, 6);
+      document.getElementById('deploy-progress-id').textContent = depId;
+      document.getElementById('live-log').innerHTML =
+        `<div class="log-line"><span class="log-time">${nowStr()}</span><span class="log-muted">Queueing deployment ${depId}...</span></div>`;
+      document.getElementById('close-deploy-modal').disabled = true;
+      document.getElementById('close-deploy-modal').textContent = 'Deploying...';
+
+      // reset steps
+      for (let i = 0; i < 6; i++) {
+        document.getElementById('li-' + i).className = 'step-indicator step-pending';
+        document.getElementById('li-' + i).textContent = (i + 1);
+        document.getElementById('lt-' + i).textContent = '';
+      }
+
+      openModal('modal-deploy-progress');
+
+      let step = 0;
+      function runStep() {
+        if (step >= 6) {
+          document.getElementById('close-deploy-modal').disabled = false;
+          document.getElementById('close-deploy-modal').textContent = 'Close';
+          addLogLine('success', '✓ All done — deployment live!');
+          showToast('success', '🎉 Deployment successful! Your app is live.');
+          return;
+        }
+        // activate step
+        const li = document.getElementById('li-' + step);
+        li.className = 'step-indicator step-active';
+        li.textContent = '⟳';
+
+        // add log lines
+        STEP_LABELS_LOG[step].forEach((line, idx) => {
+          setTimeout(() => {
+            const cls = line.startsWith('✓') ? 'log-success' : line.startsWith('→') ? 'log-info' : 'log-muted';
+            addLogLine(cls.replace('log-', ''), line);
+          }, idx * 300);
+        });
+
+        setTimeout(() => {
+          li.className = 'step-indicator step-done';
+          li.textContent = '✓';
+          document.getElementById('lt-' + step).textContent = (STEP_DURATIONS[step] / 1000).toFixed(1) + 's';
+          step++;
+          setTimeout(runStep, 200);
+        }, STEP_DURATIONS[step]);
+      }
+      setTimeout(runStep, 400);
+    }
+
+    function addLogLine(type, text) {
+      const log = document.getElementById('live-log');
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = `<span class="log-time">${nowStr()}</span><span class="log-${type}">${text}</span>`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    function nowStr() {
+      return new Date().toTimeString().slice(0, 8);
+    }
+
+    /* ── LOG STREAMING (drawer) ──────────────── */
+    function streamLogs() {
+      const log = document.getElementById('deploy-logs');
+      const entries = [
+        ['info', '→ Streaming real-time logs from container...'],
+        ['muted', '[app] Server listening on :3000'],
+        ['muted', '[app] Connected to PostgreSQL'],
+        ['muted', '[app] Redis connection established'],
+        ['success', '[health] GET /health → 200 OK (1ms)'],
+        ['muted', '[app] Processing request from 197.210.64.12'],
+        ['info', '[deploy] Log stream active ●'],
+      ];
+      let i = 0;
+      const interval = setInterval(() => {
+        if (i >= entries.length) { clearInterval(interval); return; }
+        const [type, text] = entries[i++];
+        addLogLineToEl(log, type, text);
+      }, 400);
+    }
+    function addLogLineToEl(log, type, text) {
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.innerHTML = `<span class="log-time">${nowStr()}</span><span class="log-${type}">${text}</span>`;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    /* ── TOAST NOTIFICATIONS ─────────────────── */
+    function showToast(type, msg) {
+      const icons = { success: '✅', info: 'ℹ️', warning: '⚠️', danger: '🚨' };
+      const colors = { success: 'var(--success)', info: 'var(--info)', warning: 'var(--warning)', danger: 'var(--danger)' };
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.style.borderLeft = '3px solid ' + (colors[type] || colors.info);
+      toast.innerHTML = `
+    <span class="toast-icon">${icons[type] || 'ℹ️'}</span>
+    <span class="toast-msg">${msg}</span>
+    <span class="toast-close" onclick="this.parentElement.remove()">✕</span>
+  `;
+      container.appendChild(toast);
+      setTimeout(() => { toast.style.animation = 'toastIn 0.2s ease reverse both'; setTimeout(() => toast.remove(), 200); }, 3800);
+    }
+
+    /* ── TOGGLE SWITCH ───────────────────────── */
+    function toggleSwitch(wrap) {
+      const t = wrap.querySelector('.toggle');
+      if (!t) return;
+      t.classList.toggle('on');
+      const label = wrap.querySelector('span');
+      if (label) {
+        if (t.classList.contains('on')) { label.textContent = 'Enabled'; label.style.color = 'var(--accent)'; }
+        else { label.textContent = 'Disabled'; label.style.color = 'var(--ink4)'; }
+      }
+    }
+
+    /* ── PROJECT FILTER ──────────────────────── */
+    function setProjectFilter(filter, btn) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const rows = document.querySelectorAll('#projects-tbody tr');
+      rows.forEach(row => {
+        if (filter === 'all') {
+          row.style.display = '';
+        } else if (filter === 'production') {
+          row.style.display = row.dataset.env === 'production' ? '' : 'none';
+        } else if (filter === 'staging') {
+          row.style.display = row.dataset.env === 'staging' ? '' : 'none';
+        } else if (filter === 'failed') {
+          const badge = row.querySelector('.badge-danger');
+          row.style.display = badge ? '' : 'none';
+        }
+      });
+    }
+
+    /* ── DEPLOY FILTER ───────────────────────── */
+    function setDeployFilter(filter, btn) {
+      btn.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+
+    /* ── PROJECT SEARCH ──────────────────────── */
+    function filterProjects(val) {
+      val = val.toLowerCase();
+      document.querySelectorAll('#projects-tbody tr').forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(val) ? '' : 'none';
+      });
+    }
+
+    /* ── GENERATE KEY MODAL ──────────────────── */
+    function generateKey() {
+      closeModal('modal-new-key');
+      const key = 'ngx_' + Math.random().toString(36).substr(2, 8) + '_' + Math.random().toString(36).substr(2, 24);
+      showToast('success', '🔑 Key generated: ' + key.substr(0, 20) + '...');
+    }
+
+    /* ── ACTIVITY LOG ────────────────────────── */
+    const ACTIVITY_EVENTS = [
+      { type: 'success', title: 'Deployment dep_a1b2c3 succeeded', desc: 'e-commerce-api → Production · main@a1b2c3d', time: '2 min ago' },
+      { type: 'info', title: 'API key accessed — Production Key', desc: 'Scope: deploy · IP: 197.210.64.12', time: '5 min ago' },
+      { type: 'warning', title: 'Bandwidth at 64% of monthly limit', desc: '128 GB of 200 GB used · Pro Plan', time: '1h ago' },
+      { type: 'success', title: 'Deployment dep_h7i8j9 succeeded', desc: 'blog-platform → Production · main@h7i8j9k', time: '1h ago' },
+      { type: 'danger', title: 'Deployment dep_k1l2m3 failed', desc: 'analytics-service · OOM killed during build', time: '3h ago' },
+      { type: 'info', title: 'New team member joined', desc: 'Amaka Okonkwo added as Developer', time: '5h ago' },
+      { type: 'success', title: 'Database backup completed', desc: 'pg-ecommerce-prod · 4.2 GB · af-south-1', time: '6h ago' },
+      { type: 'info', title: 'SSL certificate renewed', desc: 'api.nexgenhost.com · Valid until Sep 22, 2026', time: '12h ago' },
+      { type: 'success', title: 'Deployment dep_n4o5p6 succeeded', desc: 'payment-gateway → Production · main@n4o5p6q', time: 'Yesterday · 10:45' },
+      { type: 'info', title: 'Login from new device', desc: 'macOS · Lagos, Nigeria · Chrome 125', time: 'Yesterday · 09:12' },
+    ];
+
+    function populateActivity() {
+      const log = document.getElementById('activity-log');
+      if (!log || log.children.length > 0) return;
+      const typeMap = { success: 'success', info: 'info', warning: 'warning', danger: 'danger' };
+      log.innerHTML = ACTIVITY_EVENTS.map(ev => `
+    <div class="timeline-item">
+      <div class="timeline-dot-col">
+        <div class="t-dot ${typeMap[ev.type]}"></div>
+        <div class="timeline-line"></div>
+      </div>
+      <div class="t-content">
+        <div class="t-title">${ev.title}</div>
+        <div class="t-desc">${ev.desc}</div>
+        <div class="t-time">${ev.time}</div>
+      </div>
+    </div>
+  `).join('');
+    }
+
+    /* ── GLOBAL SEARCH ───────────────────────── */
+    function handleGlobalSearch(val) {
+      if (val.length < 2) return;
+      // Demo: route to projects with search pre-filled
+      if (val.length > 3) {
+        switchPage('projects');
+        const s = document.getElementById('project-search');
+        if (s) { s.value = val; filterProjects(val); }
+      }
+    }
+
+    /* ── KEYBOARD SHORTCUTS ──────────────────── */
+    document.addEventListener('keydown', e => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        document.getElementById('globalSearch').focus();
+      }
+      if (e.key === 'Escape') {
+        document.querySelectorAll('.drawer.open').forEach(d => closeDrawer(d.id));
+        document.querySelectorAll('.modal-backdrop.open').forEach(m => { if (m.id !== 'modal-deploy-progress') closeModal(m.id); });
+      }
+    });
+
+    /* ── INIT ────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', () => {
+      showToast('success', '🚀 Welcome back, John. No issues detected.');
+      setTimeout(() => showToast('warning', '⚠️ Bandwidth at 64%. Consider upgrading.'), 2500);
+    });
+  </script>
+</body>
+
+</html>

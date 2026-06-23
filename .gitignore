@@ -1,0 +1,52 @@
+# ── Dependencies ─────────────────────────
+node_modules/
+.pnpm-store/
+
+# ── Environment ──────────────────────────
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# ── Build outputs ────────────────────────
+dist/
+build/
+.next/
+out/
+*.js.map
+
+# ── Prisma ───────────────────────────────
+apps/api/prisma/migrations/
+
+# ── Go ───────────────────────────────────
+services/worker-go/bin/
+*.exe
+
+# ── Turbo ────────────────────────────────
+.turbo/
+
+# ── Docker ───────────────────────────────
+.docker-volumes/
+
+# ── Logs ─────────────────────────────────
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+
+# ── OS ───────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── IDE ──────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# ── Testing ──────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Temp build dirs ──────────────────────
+/tmp/nexgenhost/
