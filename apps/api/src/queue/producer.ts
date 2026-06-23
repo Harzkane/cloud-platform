@@ -27,7 +27,7 @@ const connection = {
   maxRetriesPerRequest: null as null, // Required by BullMQ
 }
 
-const QUEUE_NAME = process.env.WORKER_DEPLOY_QUEUE || 'nexgenhost:deployments'
+const QUEUE_NAME = process.env.WORKER_DEPLOY_QUEUE || 'nexgenhost-deployments'
 
 const deployQueue = new Queue<DeployJob>(QUEUE_NAME, {
   connection,

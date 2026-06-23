@@ -19,7 +19,7 @@ type Config struct {
 func Load() *Config {
 	cfg := &Config{
 		RedisURL:       getEnv("WORKER_REDIS_URL", "redis://localhost:6379"),
-		QueueName:      getEnv("WORKER_DEPLOY_QUEUE", "nexgenhost:deployments"),
+		QueueName:      getEnv("WORKER_DEPLOY_QUEUE", "nexgenhost-deployments"),
 		CallbackURL:    getEnv("WORKER_API_CALLBACK_URL", "http://localhost:3000/internal"),
 		InternalSecret: getEnv("INTERNAL_SECRET", "internal_dev_secret"),
 		WorkDir:        getEnv("WORKER_WORK_DIR", "/tmp/nexgenhost/builds"),
