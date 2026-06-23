@@ -1,7 +1,7 @@
 // ══════════════════════════════════════════════════════════
 //  NexGenHost — Smoke & Resilience Test Script
 //  Can be run against local or production APIs:
-//  Usage: API_URL=https://your-api.onrender.com node scripts/smoke-test.js
+//  Usage: API_URL=https://cloud-platform-5vf4.onrender.com node scripts/smoke-test.js
 // ══════════════════════════════════════════════════════════
 
 const API_URL = process.env.API_URL || 'http://localhost:3000';
@@ -37,7 +37,7 @@ async function runTests() {
   try {
     const { result, duration } = await timeCall(() => fetch(`${API_URL}/health`));
     assert(result.status === 200, 'Health check returned 200 OK');
-    
+
     const body = await result.json();
     assert(body.status === 'ok' && body.service === 'nexgenhost-api', 'Health check body structure is correct');
     console.log(`ℹ️ [Info] Health response time: ${duration.toFixed(2)}ms`);
@@ -106,7 +106,7 @@ async function runTests() {
       })
     });
     assert(resReg.status === 201, 'Can successfully register a new user account');
-    
+
     const regData = await resReg.json();
     assert(regData.token && regData.user, 'Registration returns valid user data and JWT token');
     authToken = regData.token;
@@ -140,16 +140,16 @@ async function runTests() {
     console.log(`\n⏳ Running Concurrency Test (5 parallel requests to /auth/me)...`);
     try {
       const startLoad = performance.now();
-      
+
       const requests = Array.from({ length: 5 }).map(() =>
         fetch(`${API_URL}/auth/me`, {
           headers: { 'Authorization': `Bearer ${authToken}` }
         })
       );
-      
+
       const responses = await Promise.all(requests);
       const totalLoadTime = performance.now() - startLoad;
-      
+
       const allOk = responses.every(res => res.status === 200);
       assert(allOk, 'All 5 concurrent requests returned successfully (200 OK)');
       console.log(`ℹ️ [Info] Concurrency total execution time: ${totalLoadTime.toFixed(2)}ms (Avg: ${(totalLoadTime / 5).toFixed(2)}ms per call)`);
@@ -182,7 +182,7 @@ async function runTests() {
   console.log(`   Passed: ${passed}`);
   console.log(`   Failed: ${failed}`);
   console.log(`══════════════════════════════════════════════════════════`);
-  
+
   if (failed > 0) {
     process.exit(1);
   } else {

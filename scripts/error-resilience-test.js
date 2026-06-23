@@ -2,6 +2,7 @@
 //  NexGenHost — Error & Resilience Tester
 //  Simulates service failures (DB down, Redis down) to verify
 //  that the API returns clean errors instead of crashing the process.
+//  Usage: API_URL=https://cloud-platform-5vf4.onrender.com node scripts/error-resilience-test.js
 // ══════════════════════════════════════════════════════════
 
 const API_URL = process.env.API_URL || 'http://localhost:3000';
@@ -53,7 +54,7 @@ async function runResilienceTests() {
   console.log('   2. Start your dev server: npm run dev');
   console.log('   3. Run: curl -i http://localhost:3000/health (should pass since health check doesn\'t require Redis)');
   console.log('   -> Expected result: Health check passes. Triggering a deployment yields a clean HTTP 500 without crashing.');
-  
+
   console.log(`══════════════════════════════════════════════════════════`);
   console.log(`📊 Resilience Test Script Written Successfully.`);
   console.log(`══════════════════════════════════════════════════════════`);
