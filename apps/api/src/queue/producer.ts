@@ -1,5 +1,4 @@
 import { Queue } from 'bullmq'
-import IORedis from 'ioredis'
 
 // ── Deploy Job Payload ────────────────────────────────────
 export interface DeployJob {
@@ -16,9 +15,17 @@ export interface DeployJob {
 }
 
 // ── Redis Connection ──────────────────────────────────────
-const connection = new IORedis(process.env.REDIS_URL || 'redis://localhost:6379', {
-  maxRetriesPerRequest: null, // Required by BullMQ
-})
+// BullMQ accepts a plain connection options object — no ioredis instance needed
+const redisUrl = new URL(process.env.REDIS_URL || 'redis://localhost:6379')
+
+const connection = {
+  host: redisUrl.hostname,
+  port: parseInt(redisUrl.port || '6379'),
+  password: redisUrl.password || undefined,
+  username: redisUrl.username || undefined,
+  tls: redisUrl.protocol === 'rediss:' ? {} : undefined,
+  maxRetriesPerRequest: null as null, // Required by BullMQ
+}
 
 const QUEUE_NAME = process.env.WORKER_DEPLOY_QUEUE || 'nexgenhost:deployments'
 
@@ -37,7 +44,7 @@ const deployQueue = new Queue<DeployJob>(QUEUE_NAME, {
  * The Go worker will pick it up and execute.
  */
 export async function pushDeployJob(job: DeployJob): Promise<string> {
-  const bullJob = await deployQueue.add(`deploy:${job.deploymentId}`, job, {
+  const bullJob = await deployQueue.add(`deploy:${job.deploymentId}` as any, job, {
     jobId: job.deploymentId, // idempotent
   })
   console.log(`[Queue] Deploy job pushed: ${bullJob.id} for deployment ${job.deploymentId}`)
