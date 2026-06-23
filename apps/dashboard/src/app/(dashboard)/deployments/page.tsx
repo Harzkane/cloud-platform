@@ -29,6 +29,17 @@ export default function DeploymentsPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [statusFilter, setStatusFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Deploy Now Modal States
+  const [isDeployModalOpen, setIsDeployModalOpen] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [selectedProjId, setSelectedProjId] = useState('');
+  const [selectedEnv, setSelectedEnv] = useState('PRODUCTION');
+  const [customCommitMsg, setCustomCommitMsg] = useState('');
+  const [customBranch, setCustomBranch] = useState('');
+  const [isDeployingNow, setIsDeployingNow] = useState(false);
+  const [deployModalError, setDeployModalError] = useState<string | null>(null);
 
   // Drawer States
   const [selectedDeploymentId, setSelectedDeploymentId] = useState<string | null>(null);
@@ -40,6 +51,60 @@ export default function DeploymentsPage() {
   useEffect(() => {
     fetchDeployments();
   }, [page, statusFilter]);
+
+  // Fetch projects to populate the Deploy Now dropdown
+  useEffect(() => {
+    apiFetch<any>('/projects')
+      .then((data) => {
+        const projs = data.projects || [];
+        setProjects(projs);
+        if (projs.length > 0) {
+          setSelectedProjId(projs[0].id);
+          setCustomBranch(projs[0].branch || 'main');
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to load projects for dropdown', err);
+      });
+  }, []);
+
+  const handleProjectChange = (projId: string) => {
+    setSelectedProjId(projId);
+    const proj = projects.find(p => p.id === projId);
+    if (proj) {
+      setCustomBranch(proj.branch || 'main');
+    }
+  };
+
+  const handleCreateDeployment = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedProjId) {
+      setDeployModalError('Please select a project');
+      return;
+    }
+    setDeployModalError(null);
+    setIsDeployingNow(true);
+
+    try {
+      await apiFetch<any>('/deployments', {
+        method: 'POST',
+        body: {
+          projectId: selectedProjId,
+          environment: selectedEnv,
+          commitMsg: customCommitMsg || 'Manual deploy via dashboard',
+          branch: customBranch || undefined,
+        },
+      });
+      setCustomCommitMsg('');
+      setIsDeployModalOpen(false);
+      fetchDeployments();
+    } catch (err: any) {
+      console.error(err);
+      setDeployModalError(err.message || 'Failed to trigger deployment');
+    } finally {
+      setIsDeployingNow(false);
+    }
+  };
 
   // Load detailed deployment info when drawer is opened
   useEffect(() => {
@@ -113,6 +178,17 @@ export default function DeploymentsPage() {
     }
   };
 
+  const filteredDeployments = searchQuery
+    ? deployments.filter((dep) => {
+        const idMatch = dep.id.toLowerCase().includes(searchQuery.toLowerCase());
+        const projectMatch = dep.project?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        const commitMatch = dep.commitMsg?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            dep.commitHash?.toLowerCase().includes(searchQuery.toLowerCase());
+        const statusMatch = dep.status?.toLowerCase().includes(searchQuery.toLowerCase());
+        return idMatch || projectMatch || commitMatch || statusMatch;
+      })
+    : deployments;
+
   return (
     <>
       <div className="page-fade">
@@ -120,6 +196,18 @@ export default function DeploymentsPage() {
           <div>
             <h1 className="page-title">Deployments</h1>
             <p className="page-subtitle">Global build pipeline activity log for Lagos Node</p>
+          </div>
+          <div className="page-actions" style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <input
+              type="text"
+              className="search-input"
+              placeholder="Search deployments..."
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setPage(1); }}
+            />
+            <button className="btn btn-primary" onClick={() => setIsDeployModalOpen(true)}>
+              ⚡ Deploy Now
+            </button>
           </div>
         </div>
 
@@ -149,7 +237,7 @@ export default function DeploymentsPage() {
             <div style={{ padding: '40px', textAlign: 'center', fontFamily: 'var(--font-mono)', color: 'var(--ink3)' }}>
               POLLING_DEPLOYMENTS_QUEUE...
             </div>
-          ) : deployments.length === 0 ? (
+          ) : filteredDeployments.length === 0 ? (
             <div style={{ padding: '40px', textAlign: 'center', color: 'var(--ink4)' }}>
               No deployments found.
             </div>
@@ -168,7 +256,7 @@ export default function DeploymentsPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {deployments.map((dep) => (
+                  {filteredDeployments.map((dep) => (
                     <tr
                       key={dep.id}
                       className="clickable"
@@ -447,6 +535,100 @@ export default function DeploymentsPage() {
           </div>
         )}
       </div>
+
+      {/* Deploy Now Modal */}
+      {isDeployModalOpen && (
+        <div className="modal-backdrop open">
+          <div className="modal" style={{ maxWidth: '460px' }}>
+            <div className="modal-header">
+              <h2 className="modal-title">⚡ Trigger Custom Deployment</h2>
+              <button className="modal-close" onClick={() => setIsDeployModalOpen(false)}>
+                &times;
+              </button>
+            </div>
+            <form onSubmit={handleCreateDeployment}>
+              <div className="modal-body">
+                {deployModalError && <div className="notice notice-danger">❌ {deployModalError}</div>}
+
+                <div className="form-group">
+                  <label className="form-label">Select Project</label>
+                  <select
+                    className="form-select"
+                    value={selectedProjId}
+                    onChange={(e) => handleProjectChange(e.target.value)}
+                    required
+                    disabled={isDeployingNow}
+                  >
+                    <option value="" disabled>-- Select a project --</option>
+                    {projects.map((proj) => (
+                      <option key={proj.id} value={proj.id}>
+                        {proj.name} ({proj.runtime})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="form-row">
+                  <div className="form-group">
+                    <label className="form-label">Environment</label>
+                    <select
+                      className="form-select"
+                      value={selectedEnv}
+                      onChange={(e) => setSelectedEnv(e.target.value)}
+                      disabled={isDeployingNow}
+                    >
+                      <option value="PRODUCTION">Production</option>
+                      <option value="STAGING">Staging</option>
+                    </select>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Branch</label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      value={customBranch}
+                      onChange={(e) => setCustomBranch(e.target.value)}
+                      placeholder="main"
+                      required
+                      disabled={isDeployingNow}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Deployment Description / Message</label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    value={customCommitMsg}
+                    onChange={(e) => setCustomCommitMsg(e.target.value)}
+                    placeholder="e.g. Update API route types"
+                    disabled={isDeployingNow}
+                  />
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setIsDeployModalOpen(false)}
+                  disabled={isDeployingNow}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isDeployingNow || !selectedProjId}
+                >
+                  {isDeployingNow ? 'Deploying...' : '⚡ Start Deployment'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </>
   );
 }
