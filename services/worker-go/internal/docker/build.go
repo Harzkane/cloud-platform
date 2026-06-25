@@ -60,29 +60,40 @@ func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string) (*BuildRes
 func generateDockerfile(repoDir, runtime, buildCmd, startCmd string) string {
 	switch {
 	case strings.HasPrefix(runtime, "node") && fileExists(repoDir+"/package.json"):
-		installCmd := "npm install --only=production"
 		copyLock := "COPY package.json ./"
+		installCmd := "npm install"     // install ALL deps including devDeps for build
+		ciInstallCmd := "npm install"
 
 		if fileExists(repoDir + "/pnpm-lock.yaml") {
-			installCmd = "npm install -g pnpm && pnpm install --prod --frozen-lockfile"
+			installCmd = "npm install -g pnpm && pnpm install --frozen-lockfile"
+			ciInstallCmd = "npm install -g pnpm && pnpm install --prod --frozen-lockfile"
 			copyLock = "COPY package.json pnpm-lock.yaml ./"
 		} else if fileExists(repoDir + "/yarn.lock") {
-			installCmd = "yarn install --production --frozen-lockfile"
+			installCmd = "yarn install --frozen-lockfile"
+			ciInstallCmd = "yarn install --production --frozen-lockfile"
 			copyLock = "COPY package.json yarn.lock ./"
 		} else if fileExists(repoDir + "/package-lock.json") {
-			installCmd = "npm ci --only=production"
+			installCmd = "npm ci"       // ci installs ALL deps (dev included) — needed for build tools
+			ciInstallCmd = "npm ci --omit=dev"
 			copyLock = "COPY package*.json ./"
 		}
 
-		return fmt.Sprintf(`FROM %s
+		return fmt.Sprintf(`FROM %s AS builder
 WORKDIR /app
 %s
 RUN %s
 COPY . .
 RUN %s
+
+FROM %s
+WORKDIR /app
+%s
+RUN %s
+COPY --from=builder /app .
 EXPOSE 3000
 CMD %s
-`, runtime, copyLock, installCmd, buildCmd, startCmd)
+`, runtime, copyLock, installCmd, buildCmd,
+			runtime, copyLock, ciInstallCmd, startCmd)
 
 	case strings.HasPrefix(runtime, "python") && fileExists(repoDir+"/requirements.txt"):
 		return fmt.Sprintf(`FROM %s
