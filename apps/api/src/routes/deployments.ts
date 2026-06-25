@@ -57,7 +57,8 @@ deploymentRoutes.post(
       startCmd: project.startCmd,
       port: project.port,
       envVars: (env.variables as Record<string, string>) || {},
-      callbackUrl: `${process.env.API_URL || 'http://localhost:3000'}/internal/deploy/callback`,
+      // Send ONLY the base /internal URL — Go reporter appends /deploy/callback
+      callbackUrl: `${process.env.API_URL || 'http://localhost:3000'}/internal`,
     })
 
     return c.json({ deployment }, 201)
