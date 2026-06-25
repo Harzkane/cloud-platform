@@ -33,6 +33,16 @@ services:
       - key: PAYSTACK_WEBHOOK_SECRET
         sync: false
       - key: INTERNAL_SECRET
-        generateValue: true
+        value: 6da37ed6006c95bb1eecffdbeba4992c279e8181645d522145bf07333e58b832
+      - key: CLOUDFLARE_API_TOKEN
+        sync: false
+      - key: CLOUDFLARE_ZONE_ID
+        sync: false
+      - key: ORACLE_VM_IP
+        sync: false
+      - key: BASE_DOMAIN
+        sync: false
+      - key: API_INTERNAL_SECRET
+        value: 6da37ed6006c95bb1eecffdbeba4992c279e8181645d522145bf07333e58b832
       - key: WORKER_DEPLOY_QUEUE
         value: nexgenhost-deployments
