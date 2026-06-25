@@ -15,7 +15,7 @@ export default function RegisterPage() {
 
   useEffect(() => {
     if (localStorage.getItem('token')) {
-      router.push('/');
+      router.push('/overview');
     }
   }, [router]);
 
@@ -31,7 +31,7 @@ export default function RegisterPage() {
       });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/');
+      router.push('/overview');
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please check details.');
     } finally {

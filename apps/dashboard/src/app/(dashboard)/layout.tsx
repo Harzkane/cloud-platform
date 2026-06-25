@@ -42,7 +42,7 @@ export default function DashboardLayout({
   }
 
   const mainItems = [
-    { name: 'Overview', path: '/', icon: '⊞' },
+    { name: 'Overview', path: '/overview', icon: '⊞' },
     { name: 'Projects', path: '/projects', icon: '📁', badge: '12', badgeType: 'info' },
     { name: 'Deployments', path: '/deployments', icon: '🚀' },
     { name: 'Databases', path: '/databases', icon: '🗄️' },

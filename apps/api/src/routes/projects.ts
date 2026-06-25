@@ -3,6 +3,7 @@ import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 import { prisma } from '../db/prisma.js'
 import { authMiddleware } from '../middleware/auth.js'
+import { createSubdomain, deleteSubdomain, toAppSlug } from '../services/domain.service.js'
 
 export const projectRoutes = new Hono()
 
@@ -96,8 +97,16 @@ projectRoutes.post('/', zValidator('json', createProjectSchema), async (c) => {
     ],
   })
 
-  // Create default subdomain
-  const subdomain = `${project.name}.nexgenhost.com`
+  // Create default subdomain on Cloudflare DNS
+  let subdomain = `${project.name}.${process.env.BASE_DOMAIN || 'naijadevhub.online'}`
+  try {
+    const slug = toAppSlug(project.name)
+    const dns = await createSubdomain(slug)
+    subdomain = dns.subdomain
+  } catch (error) {
+    console.error('Failed to create subdomain in Cloudflare:', error)
+  }
+
   await prisma.domain.create({
     data: { projectId: project.id, domain: subdomain, type: 'subdomain', sslStatus: 'ACTIVE' },
   })
@@ -127,6 +136,14 @@ projectRoutes.delete('/:id', async (c) => {
     where: { id: c.req.param('id'), userId },
   })
   if (!existing) return c.json({ error: 'Project not found' }, 404)
+
+  // Delete subdomain from Cloudflare DNS
+  try {
+    const slug = toAppSlug(existing.name)
+    await deleteSubdomain(slug)
+  } catch (error) {
+    console.error(`Failed to delete subdomain for ${existing.name} from Cloudflare:`, error)
+  }
 
   await prisma.project.delete({ where: { id: c.req.param('id') } })
   return c.json({ message: 'Project deleted' })

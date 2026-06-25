@@ -15,7 +15,7 @@ export default function LoginPage() {
   useEffect(() => {
     // If user is already logged in, redirect to overview
     if (localStorage.getItem('token')) {
-      router.push('/');
+      router.push('/overview');
     }
   }, [router]);
 
@@ -31,7 +31,7 @@ export default function LoginPage() {
       });
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
-      router.push('/');
+      router.push('/overview');
     } catch (err: any) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {

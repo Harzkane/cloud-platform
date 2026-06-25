@@ -162,7 +162,8 @@ Convert the [HTML prototype](file:///Users/harz/Documents/backUps/cloud-platform
 - `app/(auth)/login/page.tsx` — login page
 - `app/(auth)/register/page.tsx` — register page
 - `app/(dashboard)/layout.tsx` — sidebar + topbar shell
-- `app/(dashboard)/page.tsx` — overview / home
+- `app/(landing)/page.tsx` — landing page (root)
+- `app/(dashboard)/overview/page.tsx` — overview / home
 - `app/(dashboard)/projects/page.tsx` — projects list
 - `app/(dashboard)/projects/[id]/page.tsx` — project detail + deploy
 - `app/(dashboard)/deployments/page.tsx` — deployment history
