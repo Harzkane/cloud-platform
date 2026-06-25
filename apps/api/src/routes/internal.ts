@@ -8,7 +8,7 @@ import { prisma } from '../db/prisma.js'
 // Only the Go worker (same Docker network) can call these
 export const internalRoutes = new Hono()
 
-const INTERNAL_SECRET = process.env.INTERNAL_SECRET || 'internal_dev_secret'
+const INTERNAL_SECRET = process.env.INTERNAL_SECRET || process.env.API_INTERNAL_SECRET || 'internal_dev_secret'
 
 // Internal auth middleware
 internalRoutes.use('*', async (c, next) => {
