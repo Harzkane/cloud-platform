@@ -32,8 +32,7 @@ const QUEUE_NAME = process.env.WORKER_DEPLOY_QUEUE || 'nexgenhost-deployments'
 const deployQueue = new Queue<DeployJob>(QUEUE_NAME, {
   connection,
   defaultJobOptions: {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 5000 },
+    attempts: 1,       // no auto-retry — redeploy must be triggered manually from dashboard
     removeOnComplete: { count: 100 }, // keep last 100 completed
     removeOnFail: { count: 200 },
   },
