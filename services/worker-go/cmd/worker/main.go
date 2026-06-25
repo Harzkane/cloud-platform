@@ -13,6 +13,8 @@ import (
 
 	"github.com/nexgenhost/worker/internal/config"
 	"github.com/nexgenhost/worker/internal/jobs"
+	"github.com/nexgenhost/worker/internal/proxy"
+	"github.com/nexgenhost/worker/internal/routes"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -39,6 +41,9 @@ func main() {
 		log.Fatalf("[Worker] Cannot connect to Redis: %v", err)
 	}
 	log.Printf("[Worker] ✓ Connected to Redis")
+
+	routeMgr := routes.NewManager(cfg.RoutesFile)
+	go proxy.Start(cfg.ProxyAddr, routeMgr)
 
 	fmt.Printf(`
   ╔══════════════════════════════════════╗
@@ -109,6 +114,8 @@ func main() {
 			continue
 		}
 		job.WorkDir = cfg.WorkDir
+		job.BaseDomain = cfg.BaseDomain
+		job.RouteMgr = routeMgr
 
 		// Acquire semaphore slot
 		sem <- struct{}{}

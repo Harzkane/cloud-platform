@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { apiFetch } from '@/lib/api';
 import { getMockLogs, parseRealLogs } from '@/lib/mockLogs';
+import { getStepIndicator, isDeploymentInProgress } from '@/lib/deploySteps';
 
 interface Project {
   id: string;
@@ -80,6 +81,24 @@ export default function ProjectsPage() {
       setDrawerProject(null);
     }
   }, [selectedProjectId]);
+
+  // Poll drawer while a deployment is in progress
+  useEffect(() => {
+    if (!selectedProjectId || !drawerProject?.deployments?.[0]) return;
+    const status = drawerProject.deployments[0].status;
+    if (!isDeploymentInProgress(status)) return;
+
+    const interval = setInterval(() => {
+      apiFetch<{ project: any }>(`/projects/${selectedProjectId}`)
+        .then((data) => {
+          setDrawerProject(data.project);
+          fetchProjects();
+        })
+        .catch(() => {});
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [selectedProjectId, drawerProject?.deployments?.[0]?.status]);
 
   const fetchProjects = async () => {
     try {
@@ -183,24 +202,6 @@ export default function ProjectsPage() {
     if (diffHours < 24) return `${diffHours}h ago`;
     if (diffDays === 1) return 'yesterday';
     return `${diffDays}d ago`;
-  };
-
-  // Helper to resolve build step indicators dynamically
-  const getStepIndicator = (stepIndex: number, currentStatus: string) => {
-    const statuses = ['QUEUED', 'CLONING', 'BUILDING', 'PUSHING', 'STARTING', 'READY'];
-    const curIdx = statuses.indexOf(currentStatus);
-    
-    if (currentStatus === 'FAILED') {
-      return <div className="step-indicator step-pending">✕</div>;
-    }
-
-    if (curIdx >= stepIndex) {
-      return <div className="step-indicator step-done">✓</div>;
-    } else if (curIdx === stepIndex - 1) {
-      return <div className="step-indicator step-active">●</div>;
-    } else {
-      return <div className="step-indicator step-pending">{stepIndex}</div>;
-    }
   };
 
   if (loading) {

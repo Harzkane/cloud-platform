@@ -29,6 +29,7 @@ async function main() {
     await pushDeployJob({
       deploymentId: deployment.id,
       projectId: deployment.projectId,
+      projectName: deployment.project.name,
       gitRepo: deployment.project.gitRepo,
       commitHash: deployment.commitHash,
       runtime: deployment.project.runtime,

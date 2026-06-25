@@ -12,16 +12,20 @@ import (
 
 // RunConfig holds everything needed to start a container
 type RunConfig struct {
-	ImageTag     string
+	ImageTag      string
 	ContainerName string
-	Port         int
-	EnvVars      map[string]string
+	ContainerPort int
+	HostPort      int
+	EnvVars       map[string]string
+	AppSlug       string
+	BaseDomain    string
 }
 
 // RunResult holds the started container info
 type RunResult struct {
 	ContainerID string
 	LiveURL     string
+	HostPort    int
 }
 
 // Run starts a Docker container from an image.
@@ -31,11 +35,16 @@ func Run(cfg RunConfig) (*RunResult, error) {
 	stopCmd := exec.Command("docker", "rm", "-f", cfg.ContainerName)
 	stopCmd.Run() // ignore error — container may not exist
 
+	hostPort := cfg.HostPort
+	if hostPort == 0 {
+		hostPort = cfg.ContainerPort
+	}
+
 	args := []string{
 		"run", "-d",
 		"--name", cfg.ContainerName,
 		"--restart", "unless-stopped",
-		"-p", fmt.Sprintf("%d:%d", cfg.Port, cfg.Port),
+		"-p", fmt.Sprintf("%d:%d", hostPort, cfg.ContainerPort),
 		"--memory", "512m",
 		"--cpus", "0.5",
 	}
@@ -47,7 +56,7 @@ func Run(cfg RunConfig) (*RunResult, error) {
 
 	args = append(args, cfg.ImageTag)
 
-	log.Printf("[Docker] Starting container: %s", cfg.ContainerName)
+	log.Printf("[Docker] Starting container: %s (host:%d → container:%d)", cfg.ContainerName, hostPort, cfg.ContainerPort)
 	cmd := exec.Command("docker", args...)
 	var stdout, stderr bytes.Buffer
 	cmd.Stdout = &stdout
@@ -60,15 +69,38 @@ func Run(cfg RunConfig) (*RunResult, error) {
 	containerID := strings.TrimSpace(stdout.String())
 	log.Printf("[Docker] Container started: %s (ID: %s)", cfg.ContainerName, containerID[:12])
 
-	// Wait for health check
-	if err := waitForHealth(cfg.Port, 30*time.Second); err != nil {
+	// Wait for health check on the host-mapped port
+	if err := waitForHealth(hostPort, 30*time.Second); err != nil {
 		return nil, fmt.Errorf("container health check failed: %w", err)
 	}
 
+	baseDomain := cfg.BaseDomain
+	if baseDomain == "" {
+		baseDomain = "naijadevhub.online"
+	}
+
+	appSlug := cfg.AppSlug
+	if appSlug == "" {
+		appSlug = strings.TrimPrefix(cfg.ContainerName, "ngx-")
+	}
+
+	liveURL := fmt.Sprintf("https://%s.%s", appSlug, baseDomain)
+
 	return &RunResult{
 		ContainerID: containerID,
-		LiveURL:     fmt.Sprintf("https://%s.nexgenhost.com", cfg.ContainerName),
+		LiveURL:     liveURL,
+		HostPort:    hostPort,
 	}, nil
+}
+
+// HostPortForDeployment assigns a deterministic host port in 40000–49999.
+func HostPortForDeployment(deploymentID string) int {
+	h := uint32(2166136261)
+	for i := 0; i < len(deploymentID); i++ {
+		h ^= uint32(deploymentID[i])
+		h *= 16777619
+	}
+	return 40000 + int(h%10000)
 }
 
 // Stop stops and removes a container by name

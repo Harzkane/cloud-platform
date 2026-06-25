@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 import { getMockLogs, parseRealLogs } from '@/lib/mockLogs';
+import { getStepIndicator } from '@/lib/deploySteps';
 
 interface Deployment {
   id: string;
@@ -156,25 +157,6 @@ export default function DeploymentsPage() {
         return <span className="badge badge-warning">{status}</span>;
       default:
         return <span className="badge badge-muted">{status}</span>;
-    }
-  };
-
-  // Helper to resolve build step indicators dynamically
-  const getStepIndicator = (stepIndex: number, currentStatus: string) => {
-    const statuses = ['QUEUED', 'CLONING', 'BUILDING', 'PUSHING', 'STARTING', 'READY'];
-    const curIdx = statuses.indexOf(currentStatus);
-    
-    if (currentStatus === 'FAILED') {
-      // If failed, show failure at the current step or fallback
-      return <div className="step-indicator step-pending">✕</div>;
-    }
-
-    if (curIdx >= stepIndex) {
-      return <div className="step-indicator step-done">✓</div>;
-    } else if (curIdx === stepIndex - 1) {
-      return <div className="step-indicator step-active">●</div>;
-    } else {
-      return <div className="step-indicator step-pending">{stepIndex}</div>;
     }
   };
 

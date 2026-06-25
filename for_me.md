@@ -12,6 +12,8 @@ curl -X POST https://cloud-platform-5vf4.onrender.com/auth/register \
   -H "Content-Type: application/json" \
   -d '{"name": "Harz", "email": "dev@nexgenhost.com", "password": "securepassword123"}'
 
+ssh -i ~/.ssh/oracle_nexhost ubuntu@145.241.186.149
+
 
 
 ssh -i ~/.ssh/oracle_nexhost ubuntu@145.241.186.149

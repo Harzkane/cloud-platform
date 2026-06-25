@@ -50,6 +50,7 @@ deploymentRoutes.post(
     await pushDeployJob({
       deploymentId: deployment.id,
       projectId: project.id,
+      projectName: project.name,
       gitRepo: project.gitRepo,
       commitHash: deployment.commitHash,
       runtime: project.runtime,

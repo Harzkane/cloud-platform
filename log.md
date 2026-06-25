@@ -1,174 +1,468 @@
-❯ clear
-❯ ssh -i ~/.ssh/oracle_nexhost ubuntu@145.241.186.149
-
-Welcome to Ubuntu 22.04.5 LTS (GNU/Linux 6.8.0-1049-oracle x86_64)
-
- * Documentation:  https://help.ubuntu.com
- * Management:     https://landscape.canonical.com
- * Support:        https://ubuntu.com/pro
-
- System information as of Thu Jun 25 10:49:13 UTC 2026
-
-  System load:  0.0               Processes:             118
-  Usage of /:   8.3% of 44.96GB   Users logged in:       0
-  Memory usage: 32%               IPv4 address for ens3: 10.0.1.151
-  Swap usage:   0%
-
- * Strictly confined Kubernetes makes edge and IoT secure. Learn how MicroK8s
-   just raised the bar for easy, resilient and secure K8s cluster deployment.
-
-   https://ubuntu.com/engage/secure-kubernetes-at-the-edge
-
-Expanded Security Maintenance for Applications is not enabled.
-
-3 updates can be applied immediately.
-1 of these updates is a standard security update.
-To see these additional updates run: apt list --upgradable
-
-Enable ESM Apps to receive additional future security updates.
-See https://ubuntu.com/esm or run: sudo pro status
-
-New release '24.04.4 LTS' available.
-Run 'do-release-upgrade' to upgrade to it.
+terminal log:
 
 
-*** System restart required ***
-Last login: Thu Jun 25 01:28:06 2026 from 197.211.63.46
-ubuntu@nexgenhost-worker-lagos:~$ sudo bash setup.sh naijadevhub.online <CLOUDFLARE_API_TOKEN>
-[✓] Starting NexGenHost VM bootstrap for naijadevhub.online
-[✓] Updating system packages...
-[✓] Low memory detected (956MB). Setting up a 4GB swap file...
-Setting up swapspace version 1, size = 4 GiB (4294963200 bytes)
-no label, UUID=1f464263-9272-4a76-a376-69abf0837476
-vm.swappiness = 10
-[✓] 4GB Swap file created and active.
-[✓] Installing Docker...
-Selecting previously unselected package containerd.io.
-(Reading database ... 118178 files and directories currently installed.)
-Preparing to unpack .../0-containerd.io_2.2.5-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking containerd.io (2.2.5-1~ubuntu.22.04~jammy) ...
-Selecting previously unselected package docker-ce-cli.
-Preparing to unpack .../1-docker-ce-cli_5%3a29.6.0-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking docker-ce-cli (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Selecting previously unselected package docker-ce.
-Preparing to unpack .../2-docker-ce_5%3a29.6.0-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking docker-ce (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Selecting previously unselected package pigz.
-Preparing to unpack .../3-pigz_2.6-1_amd64.deb ...
-Unpacking pigz (2.6-1) ...
-Selecting previously unselected package docker-buildx-plugin.
-Preparing to unpack .../4-docker-buildx-plugin_0.35.0-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking docker-buildx-plugin (0.35.0-1~ubuntu.22.04~jammy) ...
-Selecting previously unselected package docker-ce-rootless-extras.
-Preparing to unpack .../5-docker-ce-rootless-extras_5%3a29.6.0-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking docker-ce-rootless-extras (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Selecting previously unselected package docker-compose-plugin.
-Preparing to unpack .../6-docker-compose-plugin_5.2.0-1~ubuntu.22.04~jammy_amd64.deb ...
-Unpacking docker-compose-plugin (5.2.0-1~ubuntu.22.04~jammy) ...
-Setting up docker-buildx-plugin (0.35.0-1~ubuntu.22.04~jammy) ...
-Setting up containerd.io (2.2.5-1~ubuntu.22.04~jammy) ...
-Created symlink /etc/systemd/system/multi-user.target.wants/containerd.service → /lib/systemd/system/containerd.service.
-Setting up docker-compose-plugin (5.2.0-1~ubuntu.22.04~jammy) ...
-Setting up docker-ce-cli (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Setting up pigz (2.6-1) ...
-Setting up docker-ce-rootless-extras (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Setting up docker-ce (5:29.6.0-1~ubuntu.22.04~jammy) ...
-Created symlink /etc/systemd/system/multi-user.target.wants/docker.service → /lib/systemd/system/docker.service.
-Created symlink /etc/systemd/system/sockets.target.wants/docker.socket → /lib/systemd/system/docker.socket.
-Processing triggers for man-db (2.10.2-1) ...
-Scanning processes...
-Scanning candidates...
-Scanning linux images...
+dashboard:dev:  GET /projects 200 in 434ms (next.js: 218ms, application-code: 216ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 4ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 41ms
+@nexgenhost/api:dev: --> GET /projects 200 33ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: --> POST /projects 400 9ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: --> POST /projects 400 4ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: --> POST /projects 400 4ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: --> POST /projects 400 2ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: --> POST /projects 400 2ms
+dashboard:dev:  GET /projects 200 in 87ms (next.js: 11ms, application-code: 76ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 28ms
+@nexgenhost/api:dev: --> GET /projects 200 24ms
+@nexgenhost/api:dev: <-- OPTIONS /projects/cmqtibeol0001tn311mon8zod
+@nexgenhost/api:dev: --> OPTIONS /projects/cmqtibeol0001tn311mon8zod 204 1ms
+@nexgenhost/api:dev: <-- GET /projects/cmqtibeol0001tn311mon8zod
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt" FROM "public"."projects" WHERE ("public"."projects"."id" = $1 AND "public"."projects"."userId" = $2) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."projectId", "public"."environments"."name"::text, "public"."environments"."variables", "public"."environments"."createdAt", "public"."environments"."updatedAt" FROM "public"."environments" WHERE "public"."environments"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."duration", "public"."deployments"."liveUrl", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: --> GET /projects/cmqtibeol0001tn311mon8zod 200 10ms
+dashboard:dev:  GET /projects 200 in 54ms (next.js: 5ms, application-code: 50ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 7ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: <-- OPTIONS /projects/cmqtibeol0001tn311mon8zod
+@nexgenhost/api:dev: --> OPTIONS /projects/cmqtibeol0001tn311mon8zod 204 0ms
+@nexgenhost/api:dev: <-- GET /projects/cmqtibeol0001tn311mon8zod
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt" FROM "public"."projects" WHERE ("public"."projects"."id" = $1 AND "public"."projects"."userId" = $2) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."projectId", "public"."environments"."name"::text, "public"."environments"."variables", "public"."environments"."createdAt", "public"."environments"."updatedAt" FROM "public"."environments" WHERE "public"."environments"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."duration", "public"."deployments"."liveUrl", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: --> GET /projects/cmqtibeol0001tn311mon8zod 200 4ms
+dashboard:dev:  GET /deployments 200 in 95ms (next.js: 68ms, application-code: 27ms)
+@nexgenhost/api:dev: <-- OPTIONS /deployments?page=1&limit=15
+@nexgenhost/api:dev: --> OPTIONS /deployments?page=1&limit=15 204 1ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments?page=1&limit=15
+@nexgenhost/api:dev: <-- OPTIONS /deployments?page=1&limit=15
+@nexgenhost/api:dev: --> OPTIONS /deployments?page=1&limit=15 204 1ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: <-- GET /deployments?page=1&limit=15
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 7ms
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+@nexgenhost/api:dev: --> GET /deployments?page=1&limit=15 200 10ms
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments?page=1&limit=15 200 32ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 26ms
+@nexgenhost/api:dev: <-- OPTIONS /deployments/cmqtktniu0001fe47vce8gl1a
+@nexgenhost/api:dev: --> OPTIONS /deployments/cmqtktniu0001fe47vce8gl1a 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtktniu0001fe47vce8gl1a
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtktniu0001fe47vce8gl1a 200 5ms
+dashboard:dev:  GET /databases 200 in 83ms (next.js: 55ms, application-code: 27ms)
+dashboard:dev:  GET /domains 200 in 73ms (next.js: 47ms, application-code: 26ms)
+@nexgenhost/api:dev: <-- OPTIONS /domains
+@nexgenhost/api:dev: --> OPTIONS /domains 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /domains
+@nexgenhost/api:dev: --> OPTIONS /domains 204 0ms
+@nexgenhost/api:dev: <-- GET /domains
+@nexgenhost/api:dev: <-- GET /domains
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt" FROM "public"."domains" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."domains"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."domains"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2) OFFSET $3
+@nexgenhost/api:dev: --> GET /domains 200 6ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt" FROM "public"."domains" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."domains"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."domains"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2) OFFSET $3
+@nexgenhost/api:dev: --> GET /domains 200 5ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 8ms
+dashboard:dev:  GET /billing 200 in 67ms (next.js: 45ms, application-code: 21ms)
+@nexgenhost/api:dev: <-- OPTIONS /billing/subscription
+@nexgenhost/api:dev: --> OPTIONS /billing/subscription 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /billing/subscription
+@nexgenhost/api:dev: --> OPTIONS /billing/subscription 204 0ms
+@nexgenhost/api:dev: <-- GET /billing/subscription
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: <-- GET /billing/subscription
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."subscriptions"."id", "public"."subscriptions"."userId", "public"."subscriptions"."plan"::text, "public"."subscriptions"."status"::text, "public"."subscriptions"."paystackRef", "public"."subscriptions"."paystackCustomerId", "public"."subscriptions"."currentPeriodStart", "public"."subscriptions"."currentPeriodEnd", "public"."subscriptions"."cancelledAt", "public"."subscriptions"."createdAt", "public"."subscriptions"."updatedAt" FROM "public"."subscriptions" WHERE ("public"."subscriptions"."userId" = $1 AND "public"."subscriptions"."status" IN (CAST($2::text AS "public"."SubscriptionStatus"),CAST($3::text AS "public"."SubscriptionStatus"))) ORDER BY "public"."subscriptions"."createdAt" DESC LIMIT $4 OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."subscriptions"."id", "public"."subscriptions"."userId", "public"."subscriptions"."plan"::text, "public"."subscriptions"."status"::text, "public"."subscriptions"."paystackRef", "public"."subscriptions"."paystackCustomerId", "public"."subscriptions"."currentPeriodStart", "public"."subscriptions"."currentPeriodEnd", "public"."subscriptions"."cancelledAt", "public"."subscriptions"."createdAt", "public"."subscriptions"."updatedAt" FROM "public"."subscriptions" WHERE ("public"."subscriptions"."userId" = $1 AND "public"."subscriptions"."status" IN (CAST($2::text AS "public"."SubscriptionStatus"),CAST($3::text AS "public"."SubscriptionStatus"))) ORDER BY "public"."subscriptions"."createdAt" DESC LIMIT $4 OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."users"."id", "public"."users"."plan"::text, COALESCE("aggr_selection_0_Project"."_aggr_count_projects", 0) AS "_aggr_count_projects" FROM "public"."users" LEFT JOIN (SELECT "public"."projects"."userId", COUNT(*) AS "_aggr_count_projects" FROM "public"."projects" WHERE 1=1 GROUP BY "public"."projects"."userId") AS "aggr_selection_0_Project" ON ("public"."users"."id" = "aggr_selection_0_Project"."userId") WHERE ("public"."users"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."users"."id", "public"."users"."plan"::text, COALESCE("aggr_selection_0_Project"."_aggr_count_projects", 0) AS "_aggr_count_projects" FROM "public"."users" LEFT JOIN (SELECT "public"."projects"."userId", COUNT(*) AS "_aggr_count_projects" FROM "public"."projects" WHERE 1=1 GROUP BY "public"."projects"."userId") AS "aggr_selection_0_Project" ON ("public"."users"."id" = "aggr_selection_0_Project"."userId") WHERE ("public"."users"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: --> GET /billing/subscription 200 24ms
+@nexgenhost/api:dev: --> GET /billing/subscription 200 20ms
+@nexgenhost/api:dev: <-- OPTIONS /billing/invoices
+@nexgenhost/api:dev: --> OPTIONS /billing/invoices 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /billing/invoices
+@nexgenhost/api:dev: --> OPTIONS /billing/invoices 204 0ms
+@nexgenhost/api:dev: <-- GET /billing/invoices
+@nexgenhost/api:dev: <-- GET /billing/invoices
+@nexgenhost/api:dev: prisma:query SELECT "public"."subscriptions"."id", "public"."subscriptions"."userId", "public"."subscriptions"."plan"::text, "public"."subscriptions"."status"::text, "public"."subscriptions"."paystackRef", "public"."subscriptions"."paystackCustomerId", "public"."subscriptions"."currentPeriodStart", "public"."subscriptions"."currentPeriodEnd", "public"."subscriptions"."cancelledAt", "public"."subscriptions"."createdAt", "public"."subscriptions"."updatedAt" FROM "public"."subscriptions" WHERE "public"."subscriptions"."userId" = $1 ORDER BY "public"."subscriptions"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: --> GET /billing/invoices 200 2ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."subscriptions"."id", "public"."subscriptions"."userId", "public"."subscriptions"."plan"::text, "public"."subscriptions"."status"::text, "public"."subscriptions"."paystackRef", "public"."subscriptions"."paystackCustomerId", "public"."subscriptions"."currentPeriodStart", "public"."subscriptions"."currentPeriodEnd", "public"."subscriptions"."cancelledAt", "public"."subscriptions"."createdAt", "public"."subscriptions"."updatedAt" FROM "public"."subscriptions" WHERE "public"."subscriptions"."userId" = $1 ORDER BY "public"."subscriptions"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: --> GET /billing/invoices 200 2ms
+dashboard:dev:  GET /settings 200 in 72ms (next.js: 46ms, application-code: 25ms)
+dashboard:dev:  GET /overview 200 in 70ms (next.js: 44ms, application-code: 26ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 24ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 29ms
+@nexgenhost/api:dev: <-- OPTIONS /deployments?limit=5
+@nexgenhost/api:dev: --> OPTIONS /deployments?limit=5 204 1ms
+@nexgenhost/api:dev: <-- OPTIONS /deployments?limit=5
+@nexgenhost/api:dev: --> OPTIONS /deployments?limit=5 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments?limit=5
+@nexgenhost/api:dev: <-- GET /deployments?limit=5
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+@nexgenhost/api:dev: --> GET /deployments?limit=5 200 7ms
+@nexgenhost/api:dev: --> GET /deployments?limit=5 200 6ms
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+dashboard:dev:  GET /projects 200 in 36ms (next.js: 8ms, application-code: 29ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 18ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: --> GET /projects 200 16ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- POST /projects
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."users"."id", "public"."users"."email", "public"."users"."name", "public"."users"."passwordHash", "public"."users"."avatarUrl", "public"."users"."plan"::text, "public"."users"."isVerified", "public"."users"."createdAt", "public"."users"."updatedAt", COALESCE("aggr_selection_0_Project"."_aggr_count_projects", 0) AS "_aggr_count_projects" FROM "public"."users" LEFT JOIN (SELECT "public"."projects"."userId", COUNT(*) AS "_aggr_count_projects" FROM "public"."projects" WHERE 1=1 GROUP BY "public"."projects"."userId") AS "aggr_selection_0_Project" ON ("public"."users"."id" = "aggr_selection_0_Project"."userId") WHERE ("public"."users"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query INSERT INTO "public"."projects" ("id","userId","name","gitRepo","runtime","buildCmd","startCmd","port","autoDeploy","branch","region","createdAt","updatedAt") VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13) RETURNING "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt"
+@nexgenhost/api:dev: prisma:query BEGIN
+@nexgenhost/api:dev: prisma:query INSERT INTO "public"."environments" ("createdAt","projectId","id","variables","updatedAt","name") VALUES ($1,$2,$3,$4,$5,CAST($6::text AS "public"."EnvType")), ($7,$8,$9,$10,$11,CAST($12::text AS "public"."EnvType"))
+@nexgenhost/api:dev: prisma:query COMMIT
+@nexgenhost/api:dev: [DNS] Record for afrixdroid.naijadevhub.online already exists (15fbb3d8c95cf899a9bd4ebba0f3f89d)
+@nexgenhost/api:dev: prisma:query INSERT INTO "public"."domains" ("id","projectId","domain","type","sslStatus","createdAt","updatedAt") VALUES ($1,$2,$3,$4,CAST($5::text AS "public"."DomainStatus"),$6,$7) RETURNING "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt"
+@nexgenhost/api:dev: --> POST /projects 201 1s
+@nexgenhost/api:dev: <-- OPTIONS /deployments
+@nexgenhost/api:dev: --> OPTIONS /deployments 204 0ms
+@nexgenhost/api:dev: <-- POST /deployments
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt" FROM "public"."projects" WHERE ("public"."projects"."id" = $1 AND "public"."projects"."userId" = $2) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."projectId", "public"."environments"."name"::text, "public"."environments"."variables", "public"."environments"."createdAt", "public"."environments"."updatedAt" FROM "public"."environments" WHERE (("public"."environments"."projectId" = $1 AND "public"."environments"."name" = CAST($2::text AS "public"."EnvType")) AND 1=1) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query INSERT INTO "public"."deployments" ("id","projectId","environmentId","commitHash","commitMsg","branch","status","logs","startedAt","triggeredBy") VALUES ($1,$2,$3,$4,$5,$6,CAST($7::text AS "public"."DeployStatus"),$8,$9,$10) RETURNING "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy"
+@nexgenhost/api:dev: [Queue] Deploy job pushed: cmqtm3xl40007jticnjbirmqb for deployment cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: --> POST /deployments 201 376ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 19ms
+dashboard:dev:  GET /projects 200 in 24ms (next.js: 9ms, application-code: 15ms)
+dashboard:dev:  GET /projects 200 in 30ms (next.js: 5ms, application-code: 24ms)
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: <-- OPTIONS /projects/cmqtm3wno0001jtichrwarxop
+@nexgenhost/api:dev: --> OPTIONS /projects/cmqtm3wno0001jtichrwarxop 204 1ms
+@nexgenhost/api:dev: <-- GET /projects/cmqtm3wno0001jtichrwarxop
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt" FROM "public"."projects" WHERE ("public"."projects"."id" = $1 AND "public"."projects"."userId" = $2) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."projectId", "public"."environments"."name"::text, "public"."environments"."variables", "public"."environments"."createdAt", "public"."environments"."updatedAt" FROM "public"."environments" WHERE "public"."environments"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."projectId", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."createdAt", "public"."domains"."updatedAt" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."duration", "public"."deployments"."liveUrl", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: --> GET /projects/cmqtm3wno0001jtichrwarxop 200 5ms
+dashboard:dev:  GET /deployments/cmqtm3xl40007jticnjbirmqb 200 in 1149ms (next.js: 1114ms, application-code: 35ms)
+@nexgenhost/api:dev: <-- OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: --> OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: <-- OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: --> OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb 204 0ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb 200 8ms
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb 200 6ms
+@nexgenhost/api:dev: <-- OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb/logs
+@nexgenhost/api:dev: --> OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb/logs 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb/logs
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb/logs 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+dashboard:dev:  GET /deployments/cmqtm3xl40007jticnjbirmqb 200 in 65ms (next.js: 8ms, application-code: 58ms)
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb 200 4ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb 200 5ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb/logs
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb/logs 200 3ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+dashboard:dev:  GET /projects 200 in 28ms (next.js: 5ms, application-code: 23ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 1ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 8ms
+@nexgenhost/api:dev: --> GET /projects 200 6ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+dashboard:dev:  GET /overview 200 in 27ms (next.js: 6ms, application-code: 21ms)
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: <-- OPTIONS /deployments?limit=5
+@nexgenhost/api:dev: --> OPTIONS /deployments?limit=5 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments?limit=5
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+@nexgenhost/api:dev: --> GET /deployments?limit=5 200 6ms
+@nexgenhost/api:dev: <-- GET /deployments?limit=5
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) ORDER BY "public"."deployments"."startedAt" DESC LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1,$2,$3) OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT COUNT(*) FROM (SELECT "public"."deployments"."id" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("j1"."userId" = $1 AND ("j1"."id" IS NOT NULL)) OFFSET $2) AS "sub"
+@nexgenhost/api:dev: --> GET /deployments?limit=5 200 6ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: <-- OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: --> OPTIONS /deployments/cmqtm3xl40007jticnjbirmqb 204 0ms
+@nexgenhost/api:dev: <-- GET /deployments/cmqtm3xl40007jticnjbirmqb
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."projectId", "public"."deployments"."environmentId", "public"."deployments"."commitHash", "public"."deployments"."commitMsg", "public"."deployments"."branch", "public"."deployments"."status"::text, "public"."deployments"."logs", "public"."deployments"."containerId", "public"."deployments"."imageTag", "public"."deployments"."liveUrl", "public"."deployments"."duration", "public"."deployments"."startedAt", "public"."deployments"."finishedAt", "public"."deployments"."triggeredBy" FROM "public"."deployments" LEFT JOIN "public"."projects" AS "j1" ON ("j1"."id") = ("public"."deployments"."projectId") WHERE ("public"."deployments"."id" = $1 AND ("j1"."userId" = $2 AND ("j1"."id" IS NOT NULL))) LIMIT $3 OFFSET $4
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."name", "public"."projects"."gitRepo" FROM "public"."projects" WHERE "public"."projects"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1) OFFSET $2
+@nexgenhost/api:dev: --> GET /deployments/cmqtm3xl40007jticnjbirmqb 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+dashboard:dev:  GET /projects 200 in 31ms (next.js: 3ms, application-code: 28ms)
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- OPTIONS /projects
+@nexgenhost/api:dev: --> OPTIONS /projects 204 0ms
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: <-- GET /projects
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."projects"."id", "public"."projects"."userId", "public"."projects"."name", "public"."projects"."gitRepo", "public"."projects"."runtime", "public"."projects"."buildCmd", "public"."projects"."startCmd", "public"."projects"."port", "public"."projects"."autoDeploy", "public"."projects"."branch", "public"."projects"."region", "public"."projects"."createdAt", "public"."projects"."updatedAt", COALESCE("aggr_selection_0_Deployment"."_aggr_count_deployments", 0) AS "_aggr_count_deployments" FROM "public"."projects" LEFT JOIN (SELECT "public"."deployments"."projectId", COUNT(*) AS "_aggr_count_deployments" FROM "public"."deployments" WHERE 1=1 GROUP BY "public"."deployments"."projectId") AS "aggr_selection_0_Deployment" ON ("public"."projects"."id" = "aggr_selection_0_Deployment"."projectId") WHERE "public"."projects"."userId" = $1 ORDER BY "public"."projects"."createdAt" DESC OFFSET $2
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."status"::text, "public"."deployments"."startedAt", "public"."deployments"."liveUrl", "public"."deployments"."commitHash", "public"."deployments"."environmentId", "public"."deployments"."projectId" FROM "public"."deployments" WHERE "public"."deployments"."projectId" IN ($1,$2,$3,$4) ORDER BY "public"."deployments"."startedAt" DESC OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."environments"."id", "public"."environments"."name"::text FROM "public"."environments" WHERE "public"."environments"."id" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: prisma:query SELECT "public"."domains"."id", "public"."domains"."domain", "public"."domains"."type", "public"."domains"."sslStatus"::text, "public"."domains"."projectId" FROM "public"."domains" WHERE "public"."domains"."projectId" IN ($1,$2,$3,$4) OFFSET $5
+@nexgenhost/api:dev: --> GET /projects 200 5ms
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT 1
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+^C^C - Shutting down Turborepo tasks...
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev: prisma:query SELECT "public"."deployments"."id", "public"."deployments"."logs", "public"."deployments"."status"::text FROM "public"."deployments" WHERE ("public"."deployments"."id" = $1 AND 1=1) LIMIT $2 OFFSET $3
+@nexgenhost/api:dev:  ELIFECYCLE  Command failed with exit code 130.
+dashboard:dev: 
 
-Restarting services...
-Service restarts being deferred:
- /etc/needrestart/restart.d/dbus.service
- systemctl restart networkd-dispatcher.service
- systemctl restart systemd-logind.service
- systemctl restart unattended-upgrades.service
+ Tasks:    0 successful, 2 total
+Cached:    0 cached, 2 total
+  Time:    34m2.395s 
 
-No containers need to be restarted.
 
-No user sessions are running outdated binaries.
-
-No VM guests are running outdated hypervisor (qemu) binaries on this host.
-Synchronizing state of docker.service with SysV service script with /lib/systemd/systemd-sysv-install.
-Executing: /lib/systemd/systemd-sysv-install enable docker
-[✓] Docker installed: Docker version 29.6.0, build fb59821
-[✓] Installing Go 1.22.4...
-[✓] Go installed: go version go1.22.4 linux/amd64
-[✓] Creating service user: nexhost...
-[✓] User nexhost created and added to docker group
-[✓] Creating worker directory at /opt/nexhost-worker...
-[✓] Configuring firewall...
-Backing up 'user.rules' to '/etc/ufw/user.rules.20260625_105329'
-Backing up 'before.rules' to '/etc/ufw/before.rules.20260625_105329'
-Backing up 'after.rules' to '/etc/ufw/after.rules.20260625_105329'
-Backing up 'user6.rules' to '/etc/ufw/user6.rules.20260625_105329'
-Backing up 'before6.rules' to '/etc/ufw/before6.rules.20260625_105329'
-Backing up 'after6.rules' to '/etc/ufw/after6.rules.20260625_105329'
-
-Default incoming policy changed to 'deny'
-(be sure to update your rules accordingly)
-Default outgoing policy changed to 'allow'
-(be sure to update your rules accordingly)
-Rules updated
-Rules updated (v6)
-Rules updated
-Rules updated (v6)
-Rules updated
-Rules updated (v6)
-Firewall is active and enabled on system startup
-[✓] Firewall configured (SSH + 80 + 443 only)
-[✓] Preparing Nginx...
-Synchronizing state of nginx.service with SysV service script with /lib/systemd/systemd-sysv-install.
-Executing: /lib/systemd/systemd-sysv-install enable nginx
-[✓] Setting up Certbot Cloudflare plugin...
-Selecting previously unselected package python3-soupsieve.
-(Reading database ... 118415 files and directories currently installed.)
-Preparing to unpack .../0-python3-soupsieve_2.3.1-1_all.deb ...
-Unpacking python3-soupsieve (2.3.1-1) ...
-Selecting previously unselected package python3-bs4.
-Preparing to unpack .../1-python3-bs4_4.10.0-2_all.deb ...
-Unpacking python3-bs4 (4.10.0-2) ...
-Selecting previously unselected package python3-cloudflare.
-Preparing to unpack .../2-python3-cloudflare_2.8.14-2_all.deb ...
-Unpacking python3-cloudflare (2.8.14-2) ...
-Selecting previously unselected package python3-certbot-dns-cloudflare.
-Preparing to unpack .../3-python3-certbot-dns-cloudflare_1.18.0-1_all.deb ...
-Unpacking python3-certbot-dns-cloudflare (1.18.0-1) ...
-Selecting previously unselected package python3-webencodings.
-Preparing to unpack .../4-python3-webencodings_0.5.1-4_all.deb ...
-Unpacking python3-webencodings (0.5.1-4) ...
-Selecting previously unselected package python3-html5lib.
-Preparing to unpack .../5-python3-html5lib_1.1-3_all.deb ...
-Unpacking python3-html5lib (1.1-3) ...
-Selecting previously unselected package python3-lxml:amd64.
-Preparing to unpack .../6-python3-lxml_4.8.0-1build1_amd64.deb ...
-Unpacking python3-lxml:amd64 (4.8.0-1build1) ...
-Setting up python3-webencodings (0.5.1-4) ...
-Setting up python3-html5lib (1.1-3) ...
-Setting up python3-lxml:amd64 (4.8.0-1build1) ...
-Setting up python3-soupsieve (2.3.1-1) ...
-Setting up python3-bs4 (4.10.0-2) ...
-Setting up python3-cloudflare (2.8.14-2) ...
-Setting up python3-certbot-dns-cloudflare (1.18.0-1) ...
-Scanning processes...
-Scanning candidates...
-Scanning linux images...
-
-Restarting services...
-Service restarts being deferred:
- /etc/needrestart/restart.d/dbus.service
- systemctl restart networkd-dispatcher.service
- systemctl restart systemd-logind.service
- systemctl restart unattended-upgrades.service
-
-No containers need to be restarted.
-
-No user sessions are running outdated binaries.
-
-No VM guests are running outdated hypervisor (qemu) binaries on this host.
-[✓] Requesting wildcard SSL certificate for *.naijadevhub.online and naijadevhub.online...
-[✓] SSL certificate issued for *.naijadevhub.online
-ubuntu@nexgenhost-worker-lagos:~$
+  ~/Doc/b/cloud-platform   main !1 ?1 ❯            
