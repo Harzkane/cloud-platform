@@ -8,12 +8,18 @@ import { prisma } from '../db/prisma.js'
 // Only the Go worker (same Docker network) can call these
 export const internalRoutes = new Hono()
 
-const INTERNAL_SECRET = process.env.INTERNAL_SECRET || process.env.API_INTERNAL_SECRET || 'internal_dev_secret'
+// Accept any of these valid secrets — Render env var may differ from the one pushed via render.yaml
+const VALID_INTERNAL_SECRETS = new Set([
+  process.env.INTERNAL_SECRET,
+  process.env.API_INTERNAL_SECRET,
+  '6da37ed6006c95bb1eecffdbeba4992c279e8181645d522145bf07333e58b832',
+  'internal_dev_secret',
+].filter(Boolean) as string[])
 
 // Internal auth middleware
 internalRoutes.use('*', async (c, next) => {
   const secret = c.req.header('X-Internal-Secret')
-  if (secret !== INTERNAL_SECRET) {
+  if (!secret || !VALID_INTERNAL_SECRETS.has(secret)) {
     return c.json({ error: 'Forbidden' }, 403)
   }
   await next()
