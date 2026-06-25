@@ -66,7 +66,7 @@ func Handle(job DeployJob) error {
 		LogChunk:     fmt.Sprintf("→ Building Docker image (runtime: %s)\n", job.Runtime),
 	})
 
-	buildResult, err := docker.Build(repoDir, job.DeploymentID, job.Runtime, job.BuildCmd)
+	buildResult, err := docker.Build(repoDir, job.DeploymentID, job.Runtime, job.BuildCmd, job.StartCmd)
 	if buildResult != nil && buildResult.Logs != "" {
 		reporter.ReportLog(job.DeploymentID, "BUILDING", buildResult.Logs)
 	}

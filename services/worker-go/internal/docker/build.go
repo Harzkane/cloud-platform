@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -16,7 +17,7 @@ type BuildResult struct {
 
 // Build runs `docker build` on a given source directory.
 // baseImage is used as the runtime if no Dockerfile is present.
-func Build(repoDir, deploymentID, runtime, buildCmd string) (*BuildResult, error) {
+func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string) (*BuildResult, error) {
 	imageTag := fmt.Sprintf("nexgenhost/%s:latest", deploymentID)
 
 	var logBuf bytes.Buffer
@@ -32,7 +33,7 @@ func Build(repoDir, deploymentID, runtime, buildCmd string) (*BuildResult, error
 	} else {
 		log.Printf("[Docker] Generating Dockerfile for runtime %s", runtime)
 		// Generate an inline Dockerfile
-		dockerfile := generateDockerfile(runtime, buildCmd)
+		dockerfile := generateDockerfile(repoDir, runtime, buildCmd, startCmd)
 		cmd = exec.Command(
 			"docker", "build",
 			"-t", imageTag,
@@ -56,20 +57,34 @@ func Build(repoDir, deploymentID, runtime, buildCmd string) (*BuildResult, error
 }
 
 // generateDockerfile creates a minimal Dockerfile for common runtimes
-func generateDockerfile(runtime, buildCmd string) string {
+func generateDockerfile(repoDir, runtime, buildCmd, startCmd string) string {
 	switch {
-	case strings.HasPrefix(runtime, "node"):
+	case strings.HasPrefix(runtime, "node") && fileExists(repoDir+"/package.json"):
+		installCmd := "npm install --only=production"
+		copyLock := "COPY package.json ./"
+
+		if fileExists(repoDir + "/pnpm-lock.yaml") {
+			installCmd = "npm install -g pnpm && pnpm install --prod --frozen-lockfile"
+			copyLock = "COPY package.json pnpm-lock.yaml ./"
+		} else if fileExists(repoDir + "/yarn.lock") {
+			installCmd = "yarn install --production --frozen-lockfile"
+			copyLock = "COPY package.json yarn.lock ./"
+		} else if fileExists(repoDir + "/package-lock.json") {
+			installCmd = "npm ci --only=production"
+			copyLock = "COPY package*.json ./"
+		}
+
 		return fmt.Sprintf(`FROM %s
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
+%s
+RUN %s
 COPY . .
 RUN %s
 EXPOSE 3000
-CMD ["npm", "start"]
-`, runtime, buildCmd)
+CMD %s
+`, runtime, copyLock, installCmd, buildCmd, startCmd)
 
-	case strings.HasPrefix(runtime, "python"):
+	case strings.HasPrefix(runtime, "python") && fileExists(repoDir+"/requirements.txt"):
 		return fmt.Sprintf(`FROM %s
 WORKDIR /app
 COPY requirements*.txt ./
@@ -77,9 +92,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 EXPOSE 8000
 CMD ["python", "main.py"]
-`, runtime)
+`, runtime) // Note: CMD can be overridden if python starter is generic
 
-	case strings.HasPrefix(runtime, "golang"):
+	case strings.HasPrefix(runtime, "golang") && fileExists(repoDir+"/go.mod"):
 		return fmt.Sprintf(`FROM %s AS builder
 WORKDIR /app
 COPY go.* ./
@@ -105,6 +120,10 @@ EXPOSE 3000
 }
 
 func fileExists(path string) bool {
-	_, err := exec.Command("test", "-f", path).Output()
-	return err == nil
+	info, err := os.Stat(path)
+	if err != nil {
+		return false
+	}
+	return !info.IsDir()
 }
+
