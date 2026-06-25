@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 )
 
@@ -56,26 +57,69 @@ func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string) (*BuildRes
 	return &BuildResult{ImageTag: imageTag, Logs: logBuf.String()}, nil
 }
 
+// findPackageJsons recursively finds relative paths to all package.json files in a directory,
+// ignoring common build/dependency folders.
+func findPackageJsons(repoDir string) []string {
+	var paths []string
+	err := filepath.Walk(repoDir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			name := info.Name()
+			if name == "node_modules" || name == ".git" || name == ".next" || name == "dist" || name == "build" || name == "out" {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		if info.Name() == "package.json" {
+			rel, err := filepath.Rel(repoDir, path)
+			if err == nil {
+				paths = append(paths, rel)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		log.Printf("[Docker] Error walking repoDir for package.jsons: %v", err)
+	}
+	return paths
+}
+
 // generateDockerfile creates a minimal Dockerfile for common runtimes
 func generateDockerfile(repoDir, runtime, buildCmd, startCmd string) string {
 	switch {
 	case strings.HasPrefix(runtime, "node") && fileExists(repoDir+"/package.json"):
-		copyLock := "COPY package.json ./"
-		installCmd := "npm install"     // install ALL deps including devDeps for build
-		ciInstallCmd := "npm install"
+		packageJsons := findPackageJsons(repoDir)
+		var copyInstructions []string
+		copyInstructions = append(copyInstructions, "COPY package.json package-lock.json* yarn.lock* pnpm-lock.yaml* pnpm-workspace.yaml* ./")
+		for _, relPath := range packageJsons {
+			if relPath == "package.json" {
+				continue
+			}
+			dir := filepath.Dir(relPath)
+			dir = filepath.Clean(dir)
+			copyInstructions = append(copyInstructions, fmt.Sprintf("COPY %s ./%s/", relPath, dir))
+		}
+		copyLock := strings.Join(copyInstructions, "\n")
+
+		installCmd := "npm install"
+		pruneCmd := "npm prune --omit=dev"
 
 		if fileExists(repoDir + "/pnpm-lock.yaml") {
 			installCmd = "npm install -g pnpm && pnpm install --frozen-lockfile"
-			ciInstallCmd = "npm install -g pnpm && pnpm install --prod --frozen-lockfile"
-			copyLock = "COPY package.json pnpm-lock.yaml ./"
+			pruneCmd = "pnpm prune --prod"
 		} else if fileExists(repoDir + "/yarn.lock") {
 			installCmd = "yarn install --frozen-lockfile"
-			ciInstallCmd = "yarn install --production --frozen-lockfile"
-			copyLock = "COPY package.json yarn.lock ./"
+			pruneCmd = "yarn install --production --frozen-lockfile"
 		} else if fileExists(repoDir + "/package-lock.json") {
-			installCmd = "npm ci"       // ci installs ALL deps (dev included) — needed for build tools
-			ciInstallCmd = "npm ci --omit=dev"
-			copyLock = "COPY package*.json ./"
+			installCmd = "npm ci"
+			pruneCmd = "npm prune --omit=dev"
+		}
+
+		buildRunStep := ""
+		if strings.TrimSpace(buildCmd) != "" {
+			buildRunStep = "RUN " + buildCmd
 		}
 
 		return fmt.Sprintf(`FROM %s AS builder
@@ -83,17 +127,16 @@ WORKDIR /app
 %s
 RUN %s
 COPY . .
+%s
 RUN %s
 
 FROM %s
 WORKDIR /app
-%s
-RUN %s
 COPY --from=builder /app .
 EXPOSE 3000
 CMD %s
-`, runtime, copyLock, installCmd, buildCmd,
-			runtime, copyLock, ciInstallCmd, startCmd)
+`, runtime, copyLock, installCmd, buildRunStep, pruneCmd,
+			runtime, startCmd)
 
 	case strings.HasPrefix(runtime, "python") && fileExists(repoDir+"/requirements.txt"):
 		return fmt.Sprintf(`FROM %s
@@ -121,12 +164,15 @@ CMD ["./server"]
 `, runtime)
 
 	default:
+		buildRunStep := ""
+		if strings.TrimSpace(buildCmd) != "" {
+			buildRunStep = "\nRUN " + buildCmd
+		}
 		return fmt.Sprintf(`FROM %s
 WORKDIR /app
-COPY . .
-RUN %s
+COPY . .%s
 EXPOSE 3000
-`, runtime, buildCmd)
+`, runtime, buildRunStep)
 	}
 }
 
@@ -137,4 +183,5 @@ func fileExists(path string) bool {
 	}
 	return !info.IsDir()
 }
+
 
