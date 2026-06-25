@@ -108,10 +108,12 @@ export default function DeploymentDetailPage() {
       }
     };
 
+    // Only stream live for states before container is up
     const activeStatuses = ['QUEUED', 'CLONING', 'BUILDING', 'PUSHING', 'STARTING'];
     if (activeStatuses.includes(deployment.status)) {
       startStreaming();
     } else {
+      // RUNNING, FAILED, STOPPED, CANCELLED — show stored logs
       setLogs(deployment.logs || '');
       setLoading(false);
     }

@@ -115,8 +115,8 @@ deploymentRoutes.get('/:id/logs', async (c) => {
   })
   if (!deployment) return c.json({ error: 'Deployment not found' }, 404)
 
-  // For completed deployments, return stored logs
-  if (['RUNNING', 'FAILED', 'STOPPED'].includes(deployment.status)) {
+  // For terminal/completed deployments, return stored logs immediately
+  if (['RUNNING', 'FAILED', 'STOPPED', 'CANCELLED'].includes(deployment.status)) {
     return c.json({ logs: deployment.logs, complete: true })
   }
 
@@ -143,9 +143,17 @@ deploymentRoutes.get('/:id/logs', async (c) => {
     if (['RUNNING', 'FAILED', 'STOPPED', 'CANCELLED'].includes(current.status)) {
       writer.write(encoder.encode(`data: ${JSON.stringify({ done: true, status: current.status })}\n\n`))
       clearInterval(intervalId)
-      writer.close()
+      try { writer.close() } catch {}
     }
   }, 1000)
+
+  // Listen for client disconnect to prevent loop query leak
+  c.req.raw.signal.addEventListener('abort', () => {
+    clearInterval(intervalId)
+    try {
+      writer.close()
+    } catch {}
+  })
 
   return new Response(readable, {
     headers: {

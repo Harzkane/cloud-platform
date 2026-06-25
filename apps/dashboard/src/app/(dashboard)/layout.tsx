@@ -3,7 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { getStoredUser, logoutUser } from '@/lib/api';
+import { apiFetch, getStoredUser, logoutUser } from '@/lib/api';
+
+interface MenuItem {
+  name: string;
+  path: string;
+  icon: string;
+  badge?: string;
+  badgeType?: string;
+}
 
 export default function DashboardLayout({
   children,
@@ -14,15 +22,53 @@ export default function DashboardLayout({
   const pathname = usePathname();
   const [user, setUser] = useState<{ name: string; email: string; plan: string } | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [projectsCount, setProjectsCount] = useState<number | null>(null);
+  const [runningCount, setRunningCount] = useState<number | null>(null);
 
   useEffect(() => {
     setMounted(true);
     const stored = getStoredUser();
     if (!stored) {
       router.push('/login');
-    } else {
-      setUser(stored);
+      return;
     }
+    setUser(stored);
+
+    const fetchData = async () => {
+      try {
+        const projData = await apiFetch<{ projects: any[] }>('/projects');
+        setProjectsCount(projData.projects.length);
+
+        const depData = await apiFetch<{ deployments: any[] }>('/deployments?limit=100');
+        const activeDeps = depData.deployments.filter((d: any) => 
+          ['QUEUED', 'CLONING', 'BUILDING', 'PUSHING', 'STARTING'].includes(d.status)
+        );
+        setRunningCount(activeDeps.length);
+
+        // Poll faster when there are active deployments
+        return activeDeps.length > 0;
+      } catch (err) {
+        console.error('Failed to load dynamic sidebar badges', err);
+        return false;
+      }
+    };
+
+    let intervalId: ReturnType<typeof setTimeout>;
+    const scheduleNext = async () => {
+      const hasActive = await fetchData();
+      intervalId = setTimeout(scheduleNext, hasActive ? 5000 : 15000);
+    };
+
+    scheduleNext();
+
+    // Listen for explicit refresh requests from other pages
+    const onRefresh = () => fetchData();
+    window.addEventListener('sidebar:refresh', onRefresh);
+
+    return () => {
+      clearTimeout(intervalId);
+      window.removeEventListener('sidebar:refresh', onRefresh);
+    };
   }, [router]);
 
   if (!mounted || !user) {
@@ -41,22 +87,40 @@ export default function DashboardLayout({
     );
   }
 
-  const mainItems = [
+  const mainItems: MenuItem[] = [
     { name: 'Overview', path: '/overview', icon: '⊞' },
-    { name: 'Projects', path: '/projects', icon: '📁', badge: '12', badgeType: 'info' },
-    { name: 'Deployments', path: '/deployments', icon: '🚀' },
+    { 
+      name: 'Projects', 
+      path: '/projects', 
+      icon: '📁', 
+      badge: projectsCount !== null ? String(projectsCount) : undefined, 
+      badgeType: 'info' 
+    },
+    { 
+      name: 'Deployments', 
+      path: '/deployments', 
+      icon: '🚀',
+      badge: runningCount ? String(runningCount) : undefined,
+      badgeType: 'success'
+    },
     { name: 'Databases', path: '/databases', icon: '🗄️' },
     { name: 'Domains', path: '/domains', icon: '🌐' },
   ];
 
-  const accountItems = [
-    { name: 'Billing', path: '/billing', icon: '💳', badge: '!', badgeType: 'warn' },
+  const accountItems: MenuItem[] = [
+    { 
+      name: 'Billing', 
+      path: '/billing', 
+      icon: '💳', 
+      badge: user.plan === 'STARTER' ? '!' : undefined, 
+      badgeType: 'warn' 
+    },
     { name: 'API Keys', path: '/api-keys', icon: '🔑' },
     { name: 'Settings', path: '/settings', icon: '⚙️' },
   ];
 
-  const activityItems = [
-    { name: 'Activity Log', path: '/activity', icon: '📋', badge: '3', badgeType: '' },
+  const activityItems: MenuItem[] = [
+    { name: 'Activity Log', path: '/activity', icon: '📋' },
   ];
 
   return (

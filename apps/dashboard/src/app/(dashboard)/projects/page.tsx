@@ -112,17 +112,7 @@ export default function ProjectsPage() {
         },
       });
 
-      // 2. Trigger the initial production deployment
-      await apiFetch('/deployments', {
-        method: 'POST',
-        body: {
-          projectId: project.id,
-          environment: 'PRODUCTION',
-          commitMsg: 'Initial automated build',
-        },
-      });
-
-      // Reset form and reload
+      // 2. Close modal & refresh list immediately — project is created
       setIsModalOpen(false);
       setName('');
       setGitRepo('');
@@ -131,11 +121,27 @@ export default function ProjectsPage() {
       setStartCmd('npm start');
       setPort(3000);
       setBranch('main');
+      setFormLoading(false);
+      // Notify sidebar to refresh badge counts immediately
+      window.dispatchEvent(new Event('sidebar:refresh'));
       router.replace('/projects');
       fetchProjects();
+
+      // 3. Trigger the initial production deployment (best-effort — won't block UI)
+      apiFetch('/deployments', {
+        method: 'POST',
+        body: {
+          projectId: project.id,
+          environment: 'PRODUCTION',
+          commitMsg: 'Initial automated build',
+        },
+      }).catch((depErr) => {
+        // Deployment kick-off failed (e.g., Redis unavailable) — project still exists.
+        // User can retry from the project drawer.
+        console.warn('Initial deployment trigger failed:', depErr);
+      });
     } catch (err: any) {
       setFormError(err.message || 'Failed to create project');
-    } finally {
       setFormLoading(false);
     }
   };
