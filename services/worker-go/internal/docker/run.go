@@ -48,12 +48,16 @@ func Run(cfg RunConfig) (*RunResult, error) {
 	args = append(args, cfg.ImageTag)
 
 	log.Printf("[Docker] Starting container: %s", cfg.ContainerName)
-	out, err := exec.Command("docker", args...).Output()
-	if err != nil {
-		return nil, fmt.Errorf("docker run failed: %w", err)
+	cmd := exec.Command("docker", args...)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+
+	if err := cmd.Run(); err != nil {
+		return nil, fmt.Errorf("docker run failed: %w\nstderr: %s\nstdout: %s", err, stderr.String(), stdout.String())
 	}
 
-	containerID := strings.TrimSpace(string(out))
+	containerID := strings.TrimSpace(stdout.String())
 	log.Printf("[Docker] Container started: %s (ID: %s)", cfg.ContainerName, containerID[:12])
 
 	// Wait for health check
