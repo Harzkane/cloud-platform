@@ -77,7 +77,8 @@ deploymentRoutes.post(
       port: project.port,
       envVars: (env.variables as Record<string, string>) || {},
       // Send ONLY the base /internal URL — Go reporter appends /deploy/callback
-      callbackUrl: `${process.env.API_URL || 'http://localhost:3000'}/internal`,
+      // Fall back to the Render URL if API_URL is missing in production
+      callbackUrl: `${process.env.API_URL || (process.env.NODE_ENV === 'production' ? 'https://cloud-platform-5vf4.onrender.com' : 'http://localhost:3000')}/internal`,
       vmIp,
       agentToken: decryptedToken,
     })
