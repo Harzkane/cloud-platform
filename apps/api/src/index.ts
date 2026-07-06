@@ -37,13 +37,20 @@ app.use('*', cors({
 }))
 
 // ── Health Check ─────────────────────────────────────────
-app.get('/health', (c) => c.json({
-  status: 'ok',
-  service: 'nexgenhost-api',
-  version: '0.1.0',
-  timestamp: new Date().toISOString(),
-  uptime: process.uptime(),
-}))
+app.get('/health', (c) => {
+  const redisUrl = process.env.REDIS_URL || 'not-set';
+  const maskedRedis = redisUrl !== 'not-set' 
+    ? redisUrl.replace(/:[^@]+@/, ':***@') 
+    : 'not-set';
+  return c.json({
+    status: 'ok',
+    service: 'nexgenhost-api',
+    version: '0.1.0',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    redis: maskedRedis
+  });
+})
 
 // ── API Routes ───────────────────────────────────────────
 app.route('/auth', authRoutes)
