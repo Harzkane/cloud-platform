@@ -752,7 +752,7 @@ export default function ProjectsPage() {
                       .then((data) => setDrawerProject(data.project));
                   } catch (err) {
                     console.error(err);
-                    alert('Failed to trigger deployment');
+                    alert(err instanceof Error ? err.message : 'Failed to trigger deployment');
                   } finally {
                     setDeploying(false);
                   }
