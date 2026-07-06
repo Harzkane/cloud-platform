@@ -10,30 +10,23 @@ import { encrypt } from './crypto.service.js'
  */
 
 /**
- * Atomic VM Allocation
- * Uses a raw PostgreSQL query with row-locking (FOR UPDATE SKIP LOCKED)
- * to prevent double-allocating the same VM to two concurrent projects.
+ * Shared VM Allocation
+ * Selects an existing VM that is either AVAILABLE or already ALLOCATED to another project.
+ * This allows multiple projects to share the same underlying VM infrastructure.
  */
 export async function allocateVm(): Promise<string | null> {
-  return await prisma.$transaction(async (tx) => {
-    // Select an AVAILABLE VM and lock the row, skipping any already locked by other transactions
-    const result = await tx.$queryRaw<Array<{ id: string }>>`
-      UPDATE vms
-      SET status = 'ALLOCATED', "updatedAt" = NOW()
-      WHERE id = (
-        SELECT id FROM vms
-        WHERE status = 'AVAILABLE'
-        LIMIT 1
-        FOR UPDATE SKIP LOCKED
-      )
-      RETURNING id;
-    `
-    
-    if (result && result.length > 0) {
-      return result[0].id
+  const vm = await prisma.vm.findFirst({
+    where: {
+      status: {
+        in: ['AVAILABLE', 'ALLOCATED']
+      }
+    },
+    orderBy: {
+      createdAt: 'asc'
     }
-    return null
   })
+  
+  return vm ? vm.id : null;
 }
 
 /**
