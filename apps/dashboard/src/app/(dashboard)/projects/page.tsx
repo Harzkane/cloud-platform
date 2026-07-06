@@ -54,6 +54,12 @@ export default function ProjectsPage() {
   const [deploying, setDeploying] = useState(false);
   const [actionSuccessMessage, setActionSuccessMessage] = useState<string | null>(null);
 
+  // Inline Env Edit State
+  const [isEditingEnv, setIsEditingEnv] = useState(false);
+  const [envList, setEnvList] = useState<{ key: string; value: string }[]>([]);
+  const [saveEnvLoading, setSaveEnvLoading] = useState(false);
+  const [envMsg, setEnvMsg] = useState<{ type: 'success' | 'danger'; text: string } | null>(null);
+
   useEffect(() => {
     // If the query param new=true is passed, open the create modal
     if (searchParams.get('new') === 'true') {
@@ -162,6 +168,70 @@ export default function ProjectsPage() {
     } catch (err: any) {
       setFormError(err.message || 'Failed to create project');
       setFormLoading(false);
+    }
+  };
+
+  // --- Env Edit Handlers ---
+  const handleEditEnvClick = () => {
+    setIsEditingEnv(true);
+    setEnvMsg(null);
+    const prodEnv = drawerProject?.environments?.find((e: any) => e.name === 'PRODUCTION');
+    const vars = prodEnv?.variables || {};
+    const list = Object.keys(vars).map((k) => ({ key: k, value: vars[k] }));
+    setEnvList(list.length > 0 ? list : [{ key: '', value: '' }]);
+  };
+
+  const handleCancelEnvEdit = () => {
+    setIsEditingEnv(false);
+    setEnvMsg(null);
+  };
+
+  const addEnvField = () => {
+    setEnvList([...envList, { key: '', value: '' }]);
+  };
+
+  const updateEnvField = (index: number, field: 'key' | 'value', val: string) => {
+    const copy = [...envList];
+    copy[index][field] = val;
+    setEnvList(copy);
+  };
+
+  const removeEnvField = (index: number) => {
+    setEnvList(envList.filter((_, i) => i !== index));
+  };
+
+  const handleSaveEnv = async () => {
+    if (!drawerProject) return;
+    setSaveEnvLoading(true);
+    setEnvMsg(null);
+    try {
+      const variables: Record<string, string> = {};
+      for (const item of envList) {
+        if (item.key.trim()) {
+          variables[item.key.trim()] = item.value;
+        }
+      }
+
+      await apiFetch(`/projects/${drawerProject.id}/env/PRODUCTION`, {
+        method: 'PUT',
+        body: { variables },
+      });
+
+      setEnvMsg({ type: 'success', text: 'Environment variables saved!' });
+      
+      // Refresh drawer details
+      const data = await apiFetch<{ project: any }>(`/projects/${drawerProject.id}`);
+      setDrawerProject(data.project);
+      
+      // Close editing after a short delay
+      setTimeout(() => {
+        setIsEditingEnv(false);
+        setEnvMsg(null);
+      }, 2000);
+    } catch (err: any) {
+      setEnvMsg({ type: 'danger', text: err.message || 'Failed to save variables' });
+    } finally {
+      setSaveEnvLoading(false);
     }
   };
 
@@ -604,41 +674,109 @@ export default function ProjectsPage() {
 
                   return (
                     <>
-                      <table className="data-table" style={{ marginTop: '8px' }}>
-                        <thead>
-                          <tr>
-                            <th>Key</th>
-                            <th>Value</th>
-                            <th></th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {displayKeys.map((k) => (
-                            <tr key={k}>
-                              <td className="td-mono">{k}</td>
-                              <td className="td-mono">
-                                {k === 'NODE_ENV' ? displayVars[k] : '••••••••••••••••'}
-                              </td>
-                              <td>
+                      {envMsg && (
+                        <div className={`notice notice-${envMsg.type}`} style={{ marginBottom: '12px' }}>
+                          {envMsg.text}
+                        </div>
+                      )}
+
+                      {isEditingEnv ? (
+                        <div style={{ marginTop: '8px' }}>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                            {envList.map((item, index) => (
+                              <div key={index} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  placeholder="KEY"
+                                  value={item.key}
+                                  onChange={(e) => updateEnvField(index, 'key', e.target.value)}
+                                  style={{ flex: 1, fontFamily: 'monospace' }}
+                                />
+                                <input
+                                  type="text"
+                                  className="form-input"
+                                  placeholder="value"
+                                  value={item.value}
+                                  onChange={(e) => updateEnvField(index, 'value', e.target.value)}
+                                  style={{ flex: 2, fontFamily: 'monospace' }}
+                                />
                                 <button
+                                  type="button"
                                   className="btn btn-ghost"
-                                  style={{ padding: '2px 8px', fontSize: '10px' }}
-                                  onClick={() => router.push(`/projects/${drawerProject.id}`)}
+                                  style={{ padding: '4px' }}
+                                  onClick={() => removeEnvField(index)}
                                 >
-                                  Edit
+                                  🗑️
                                 </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <button
-                        className="btn btn-ghost"
-                        style={{ marginTop: '8px', fontSize: '11px' }}
-                        onClick={() => router.push(`/projects/${drawerProject.id}`)}
-                      >
-                        + Add Variable
-                      </button>
+                              </div>
+                            ))}
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', marginTop: '12px' }}>
+                            <button className="btn btn-ghost" style={{ fontSize: '11px' }} onClick={addEnvField}>
+                              + Add Variable
+                            </button>
+                          </div>
+
+                          <div style={{ display: 'flex', gap: '8px', marginTop: '16px' }}>
+                            <button
+                              className="btn btn-primary"
+                              style={{ flex: 1 }}
+                              onClick={handleSaveEnv}
+                              disabled={saveEnvLoading}
+                            >
+                              {saveEnvLoading ? 'Saving...' : 'Save Config'}
+                            </button>
+                            <button
+                              className="btn btn-ghost"
+                              style={{ flex: 1 }}
+                              onClick={handleCancelEnvEdit}
+                              disabled={saveEnvLoading}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <>
+                          <table className="data-table" style={{ marginTop: '8px' }}>
+                            <thead>
+                              <tr>
+                                <th>Key</th>
+                                <th>Value</th>
+                                <th></th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {displayKeys.map((k) => (
+                                <tr key={k}>
+                                  <td className="td-mono">{k}</td>
+                                  <td className="td-mono">
+                                    {k === 'NODE_ENV' ? displayVars[k] : '••••••••••••••••'}
+                                  </td>
+                                  <td>
+                                    <button
+                                      className="btn btn-ghost"
+                                      style={{ padding: '2px 8px', fontSize: '10px' }}
+                                      onClick={handleEditEnvClick}
+                                    >
+                                      Edit
+                                    </button>
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <button
+                            className="btn btn-ghost"
+                            style={{ marginTop: '8px', fontSize: '11px' }}
+                            onClick={handleEditEnvClick}
+                          >
+                            + Add Variable
+                          </button>
+                        </>
+                      )}
                     </>
                   );
                 })()}
