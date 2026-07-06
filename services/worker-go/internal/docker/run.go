@@ -70,7 +70,7 @@ func Run(cfg RunConfig) (*RunResult, error) {
 	log.Printf("[Docker] Container started: %s (ID: %s)", cfg.ContainerName, containerID[:12])
 
 	// Wait for health check on the host-mapped port
-	if err := waitForHealth(hostPort, 30*time.Second); err != nil {
+	if err := waitForHealth(hostPort, 90*time.Second); err != nil {
 		return nil, fmt.Errorf("container health check failed: %w", err)
 	}
 

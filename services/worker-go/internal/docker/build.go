@@ -1,6 +1,7 @@
 package docker
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"log"
@@ -18,7 +19,7 @@ type BuildResult struct {
 
 // Build runs `docker build` on a given source directory.
 // baseImage is used as the runtime if no Dockerfile is present.
-func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string) (*BuildResult, error) {
+func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string, onLog func(string)) (*BuildResult, error) {
 	imageTag := fmt.Sprintf("nexgenhost/%s:latest", deploymentID)
 
 	var logBuf bytes.Buffer
@@ -45,10 +46,27 @@ func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string) (*BuildRes
 		cmd.Stdin = strings.NewReader(dockerfile)
 	}
 
-	cmd.Stdout = &logBuf
-	cmd.Stderr = &logBuf
+	stdoutPipe, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, fmt.Errorf("failed to get stdout pipe: %w", err)
+	}
+	cmd.Stderr = cmd.Stdout // Redirect stderr to stdout to capture everything
 
-	if err := cmd.Run(); err != nil {
+	if err := cmd.Start(); err != nil {
+		return nil, fmt.Errorf("failed to start docker build: %w", err)
+	}
+
+	// Stream output line by line in real-time
+	scanner := bufio.NewScanner(stdoutPipe)
+	for scanner.Scan() {
+		line := scanner.Text()
+		logBuf.WriteString(line + "\n")
+		if onLog != nil {
+			onLog(line + "\n")
+		}
+	}
+
+	if err := cmd.Wait(); err != nil {
 		return &BuildResult{Logs: logBuf.String()},
 			fmt.Errorf("docker build failed: %w\n%s", err, logBuf.String())
 	}

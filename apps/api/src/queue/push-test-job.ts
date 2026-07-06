@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client'
 import { pushDeployJob } from './producer.js'
+import { decrypt } from '../services/crypto.service.js'
 
 const prisma = new PrismaClient()
 
@@ -14,7 +15,9 @@ async function main() {
     const deployment = await prisma.deployment.findUnique({
       where: { id: deploymentId },
       include: {
-        project: true,
+        project: {
+          include: { vm: true }
+        },
         environment: true,
       },
     })
@@ -25,6 +28,14 @@ async function main() {
     }
 
     console.log(`Found deployment ${deploymentId} in status: ${deployment.status}`)
+
+    let vmIp = '127.0.0.1'
+    let decryptedToken = 'dev-token-123'
+
+    if (deployment.project.vm) {
+      vmIp = deployment.project.vm.ip
+      decryptedToken = decrypt(deployment.project.vm.agentToken)
+    }
 
     await pushDeployJob({
       deploymentId: deployment.id,
@@ -39,6 +50,8 @@ async function main() {
       envVars: (deployment.environment.variables as Record<string, string>) || {},
       // Base /internal URL — Go reporter appends /deploy/callback
       callbackUrl: `https://cloud-platform-5vf4.onrender.com/internal`,
+      vmIp,
+      agentToken: decryptedToken,
     })
 
     console.log(`Successfully pushed job ${deploymentId} to Upstash Redis!`)

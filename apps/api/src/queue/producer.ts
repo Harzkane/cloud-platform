@@ -13,6 +13,8 @@ export interface DeployJob {
   port: number          // 3000
   envVars: Record<string, string>
   callbackUrl: string   // http://api:3000/internal/deploy/callback
+  vmIp: string
+  agentToken: string
 }
 
 const QUEUE_NAME = process.env.WORKER_DEPLOY_QUEUE || 'nexgenhost-deployments'

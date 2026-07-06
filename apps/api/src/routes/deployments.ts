@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '../db/prisma.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { pushDeployJob } from '../queue/producer.js'
+import { decrypt } from '../services/crypto.service.js'
 
 export const deploymentRoutes = new Hono()
 
@@ -24,7 +25,10 @@ deploymentRoutes.post(
     const { projectId, environment, commitHash, commitMsg, branch } = c.req.valid('json')
 
     // Verify ownership
-    const project = await prisma.project.findFirst({ where: { id: projectId, userId } })
+    const project = await prisma.project.findFirst({ 
+      where: { id: projectId, userId },
+      include: { vm: true }
+    })
     if (!project) return c.json({ error: 'Project not found' }, 404)
 
     // Get environment record
@@ -46,6 +50,20 @@ deploymentRoutes.post(
       },
     })
 
+    let vmIp = process.env.ORACLE_VM_IP || '145.241.186.149'
+    let decryptedToken = 'dev_secret'
+
+    if (project.vm) {
+      if (project.vm.status === 'PROVISIONING') {
+        return c.json({ error: 'Target VM is still provisioning. Please try again in a few moments.' }, 400)
+      }
+      if (project.vm.status === 'FAILED') {
+        return c.json({ error: 'Target VM provisioning failed. Please recreate the project.' }, 400)
+      }
+      vmIp = project.vm.ip
+      decryptedToken = decrypt(project.vm.agentToken)
+    }
+
     // Push job to Redis → Go worker picks it up
     await pushDeployJob({
       deploymentId: deployment.id,
@@ -60,6 +78,8 @@ deploymentRoutes.post(
       envVars: (env.variables as Record<string, string>) || {},
       // Send ONLY the base /internal URL — Go reporter appends /deploy/callback
       callbackUrl: `${process.env.API_URL || 'http://localhost:3000'}/internal`,
+      vmIp,
+      agentToken: decryptedToken,
     })
 
     return c.json({ deployment }, 201)

@@ -1,5 +1,6 @@
 import { pushDeployJob, removeDeployJob } from './producer.js'
 import { PrismaClient } from '@prisma/client'
+import { decrypt } from '../services/crypto.service.js'
 
 const prisma = new PrismaClient()
 
@@ -16,7 +17,12 @@ async function main() {
   // Fetch deployment + project from DB
   const deployment = await prisma.deployment.findUnique({
     where: { id: JOB_ID },
-    include: { project: true, environment: true },
+    include: {
+      project: {
+        include: { vm: true }
+      },
+      environment: true,
+    },
   })
   if (!deployment) {
     console.error(`Deployment ${JOB_ID} not found in database`)
@@ -24,6 +30,14 @@ async function main() {
   }
 
   console.log(`📦  Deployment: ${JOB_ID} | Project: ${deployment.project.name} | Status: ${deployment.status}`)
+
+  let vmIp = '127.0.0.1'
+  let decryptedToken = 'dev-token-123'
+
+  if (deployment.project.vm) {
+    vmIp = deployment.project.vm.ip
+    decryptedToken = decrypt(deployment.project.vm.agentToken)
+  }
 
   // Push fresh job
   await pushDeployJob({
@@ -38,6 +52,8 @@ async function main() {
     port: deployment.project.port,
     envVars: (deployment.environment?.variables as Record<string, string>) || {},
     callbackUrl: `${process.env.API_URL || 'https://cloud-platform-5vf4.onrender.com'}/internal`,
+    vmIp,
+    agentToken: decryptedToken,
   })
 
   console.log(`✅  Job ${JOB_ID} pushed to Upstash Redis — worker will pick it up shortly!`)

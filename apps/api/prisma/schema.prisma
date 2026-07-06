@@ -54,15 +54,16 @@ enum SubscriptionStatus {
 // ─────────────────── Models ─────────────────────────────
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String
-  passwordHash String
-  avatarUrl    String?
-  plan         Plan     @default(STARTER)
-  isVerified   Boolean  @default(false)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id                String   @id @default(cuid())
+  email             String   @unique
+  name              String
+  passwordHash      String
+  avatarUrl         String?
+  plan              Plan     @default(STARTER)
+  isVerified        Boolean  @default(false)
+  githubAccessToken String?  // Encrypted GitHub OAuth token
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   projects      Project[]
   subscriptions Subscription[]
@@ -74,6 +75,7 @@ model User {
 model Project {
   id         String   @id @default(cuid())
   userId     String
+  vmId       String?
   name       String
   gitRepo    String   // https://github.com/user/repo
   runtime    String   @default("node:20-alpine")
@@ -87,6 +89,7 @@ model Project {
   updatedAt  DateTime @updatedAt
 
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vm           Vm?           @relation(fields: [vmId], references: [id], onDelete: SetNull)
   environments Environment[]
   deployments  Deployment[]
   domains      Domain[]
@@ -180,4 +183,17 @@ model ApiKey {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("api_keys")
+}
+
+model Vm {
+  id         String   @id @default(cuid())
+  ip         String   @unique
+  agentToken String   // Encrypted agent token
+  status     String   @default("AVAILABLE") // "AVAILABLE", "ALLOCATED", "PROVISIONING", "FAILED"
+  provider   String   @default("GCP")       // "GCP", "ORACLE", "ICN"
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  projects   Project[]
+
+  @@map("vms")
 }

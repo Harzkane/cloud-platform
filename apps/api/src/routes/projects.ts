@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { prisma } from '../db/prisma.js'
 import { authMiddleware } from '../middleware/auth.js'
 import { createSubdomain, deleteSubdomain, toAppSlug } from '../services/domain.service.js'
+import { allocateVm, triggerVmProvisioning } from '../services/provisioner.service.js'
 
 export const projectRoutes = new Hono()
 
@@ -85,9 +86,16 @@ projectRoutes.post('/', zValidator('json', createProjectSchema), async (c) => {
     }, 403)
   }
 
+  // Allocate an available VM or trigger async provisioning
+  const vmId = await allocateVm()
+
   const project = await prisma.project.create({
-    data: { ...data, userId },
+    data: { ...data, userId, vmId },
   })
+
+  if (!vmId) {
+    await triggerVmProvisioning(project.id)
+  }
 
   // Create default environments
   await prisma.environment.createMany({
