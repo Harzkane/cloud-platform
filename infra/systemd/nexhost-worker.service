@@ -1,0 +1,43 @@
+[Unit]
+Description=NexGenHost Go Worker Engine
+Documentation=https://github.com/Harzkane/cloud-platform
+After=network.target docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=codewithharz
+Group=docker
+WorkingDirectory=/opt/nexhost-worker
+
+ExecStart=/opt/nexhost-worker/bin/worker
+
+Environment="WORKER_REDIS_URL=rediss://default:gQAAAAAAAlYGAAIgcDI1MjRlYjM5Y2ZlYTk0YTk3YTA1NWQ4MjE5MGE0ODE4Mg@summary-wildcat-153094.upstash.io:6379"
+Environment="WORKER_DEPLOY_QUEUE=nexgenhost-deployments"
+Environment="WORKER_API_CALLBACK_URL=https://cloud-platform-5vf4.onrender.com/internal"
+Environment="INTERNAL_SECRET=6da37ed6006c95bb1eecffdbeba4992c279e8181645d522145bf07333e58b832"
+Environment="DOCKER_HOST=unix:///var/run/docker.sock"
+Environment="WORKER_WORK_DIR=/opt/nexhost-worker/tmp"
+Environment="WORKER_ID=gcp-worker-1"
+Environment="BASE_DOMAIN=naijadevhub.online"
+Environment="ROUTES_FILE=/opt/nexhost-worker/routes.json"
+Environment="PROXY_ADDR=127.0.0.1:9090"
+
+Restart=always
+RestartSec=5s
+StartLimitInterval=60s
+StartLimitBurst=3
+
+StandardOutput=append:/opt/nexhost-worker/logs/worker.log
+StandardError=append:/opt/nexhost-worker/logs/worker-error.log
+
+MemoryMax=512M
+CPUQuota=80%
+
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/nexhost-worker /var/run/docker.sock /tmp
+
+[Install]
+WantedBy=multi-user.target
