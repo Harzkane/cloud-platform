@@ -19,10 +19,24 @@ type BuildResult struct {
 
 // Build runs `docker build` on a given source directory.
 // baseImage is used as the runtime if no Dockerfile is present.
-func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string, onLog func(string)) (*BuildResult, error) {
+func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string, envVars map[string]string, onLog func(string)) (*BuildResult, error) {
 	imageTag := fmt.Sprintf("nexgenhost/%s:latest", deploymentID)
 
 	var logBuf bytes.Buffer
+
+	// Write environment variables to .env.local for Next.js/React build processes
+	if len(envVars) > 0 {
+		var envContent string
+		for k, v := range envVars {
+			envContent += fmt.Sprintf("%s=%s\n", k, v)
+		}
+		envFilePath := filepath.Join(repoDir, ".env.local")
+		if err := os.WriteFile(envFilePath, []byte(envContent), 0644); err != nil {
+			log.Printf("[Docker] Failed to write .env.local: %v", err)
+		} else {
+			log.Printf("[Docker] Wrote .env.local with %d variables", len(envVars))
+		}
+	}
 
 	// Check if repo has its own Dockerfile
 	hasDockerfile := fileExists(repoDir + "/Dockerfile")
