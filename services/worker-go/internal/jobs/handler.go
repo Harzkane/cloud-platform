@@ -53,11 +53,6 @@ func Handle(job DeployJob) error {
 
 	// ── STEP 1: Clone repository ─────────────────────────
 	logf("CLONING", "→ Cloning %s @ %s", job.GitRepo, job.CommitHash)
-	reporter.Report(internalapi.CallbackPayload{
-		DeploymentID: job.DeploymentID,
-		Status:       "CLONING",
-		LogChunk:     fmt.Sprintf("→ Cloning %s @ %s\n", job.GitRepo, job.CommitHash),
-	})
 
 	repoDir, err := git.Clone(job.GitRepo, job.CommitHash, job.WorkDir, job.DeploymentID)
 	if err != nil {
@@ -85,11 +80,6 @@ func Handle(job DeployJob) error {
 
 	// ── STEP 2: Docker build ─────────────────────────────
 	logf("BUILDING", "→ Building Docker image (runtime: %s)", job.Runtime)
-	reporter.Report(internalapi.CallbackPayload{
-		DeploymentID: job.DeploymentID,
-		Status:       "BUILDING",
-		LogChunk:     fmt.Sprintf("→ Building Docker image (runtime: %s)\n", job.Runtime),
-	})
 
 	buildResult, err := docker.Build(repoDir, job.DeploymentID, job.Runtime, job.BuildCmd, job.StartCmd, job.EnvVars, func(line string) {
 		reporter.ReportLog(job.DeploymentID, "BUILDING", line)
@@ -108,12 +98,6 @@ func Handle(job DeployJob) error {
 	// ── STEP 3: Run container ────────────────────────────
 	containerName := fmt.Sprintf("ngx-%s", job.DeploymentID[:12])
 	logf("STARTING", "→ Starting container '%s' on host port %d", containerName, hostPort)
-	reporter.Report(internalapi.CallbackPayload{
-		DeploymentID: job.DeploymentID,
-		Status:       "STARTING",
-		ImageTag:     buildResult.ImageTag,
-		LogChunk:     fmt.Sprintf("→ Starting container '%s' on host port %d\n", containerName, hostPort),
-	})
 
 	runResult, err := docker.Run(docker.RunConfig{
 		ImageTag:      buildResult.ImageTag,
