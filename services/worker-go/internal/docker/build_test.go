@@ -46,7 +46,7 @@ func TestGenerateDockerfileWorkspaces(t *testing.T) {
 		t.Fatalf("failed to write lock file: %v", err)
 	}
 
-	dockerfile := generateDockerfile(tempDir, "node:20-alpine", "npm run build", "npm run start")
+	dockerfile := generateDockerfile(tempDir, "node:20-alpine", "npm run build", "npm run start", nil)
 
 	// Verify COPY commands exist for frontend and backend package.jsons
 	if !strings.Contains(dockerfile, "COPY frontend/package.json ./frontend/") {
@@ -86,10 +86,52 @@ func TestGenerateDockerfileNoBuildCmd(t *testing.T) {
 		t.Fatalf("failed to write package.json: %v", err)
 	}
 
-	dockerfile := generateDockerfile(tempDir, "node:20-alpine", "   ", "npm run start")
+	dockerfile := generateDockerfile(tempDir, "node:20-alpine", "   ", "npm run start", nil)
 
 	// RUN <buildCmd> should be omitted entirely
 	if strings.Contains(dockerfile, "RUN    ") || strings.Contains(dockerfile, "RUN \n") {
 		t.Errorf("expected build step to be omitted, got:\n%s", dockerfile)
+	}
+}
+
+func TestGenerateDockerfileEnvVarInjection(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "repo-env-test-*")
+	if err != nil {
+		t.Fatalf("failed to create temp dir: %v", err)
+	}
+	defer os.RemoveAll(tempDir)
+
+	if err := os.WriteFile(filepath.Join(tempDir, "package.json"), []byte("{}"), 0644); err != nil {
+		t.Fatalf("failed to write package.json: %v", err)
+	}
+
+	envVars := map[string]string{
+		"MONGODB_URI": "mongodb+srv://user:pass@cluster.mongodb.net/db",
+		"NODE_ENV":    "production",
+	}
+
+	dockerfile := generateDockerfile(tempDir, "node:20-alpine", "npm run build", "npm start", envVars)
+
+	// Verify ENV statements are present in the Dockerfile
+	if !strings.Contains(dockerfile, "ENV MONGODB_URI=\"") {
+		t.Errorf("expected ENV MONGODB_URI to be injected, got:\n%s", dockerfile)
+	}
+	if !strings.Contains(dockerfile, "ENV NODE_ENV=\"") {
+		t.Errorf("expected ENV NODE_ENV to be injected, got:\n%s", dockerfile)
+	}
+
+	// Verify quotes are present (values wrapped in double quotes)
+	if !strings.Contains(dockerfile, `"mongodb+srv://user:pass@cluster.mongodb.net/db"`) {
+		t.Errorf("expected MONGODB_URI value to be quoted, got:\n%s", dockerfile)
+	}
+
+	// Env block should appear BEFORE the build step so build phase has access
+	envIdx := strings.Index(dockerfile, "ENV MONGODB_URI")
+	buildIdx := strings.Index(dockerfile, "RUN npm run build")
+	if envIdx == -1 || buildIdx == -1 {
+		t.Fatalf("could not find ENV or RUN build step in:\n%s", dockerfile)
+	}
+	if envIdx > buildIdx {
+		t.Errorf("expected ENV block before RUN npm run build, but it came after")
 	}
 }

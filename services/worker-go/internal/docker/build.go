@@ -24,20 +24,6 @@ func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string, envVars ma
 
 	var logBuf bytes.Buffer
 
-	// Write environment variables to .env.local for Next.js/React build processes
-	if len(envVars) > 0 {
-		var envContent string
-		for k, v := range envVars {
-			envContent += fmt.Sprintf("%s=%s\n", k, v)
-		}
-		envFilePath := filepath.Join(repoDir, ".env.local")
-		if err := os.WriteFile(envFilePath, []byte(envContent), 0644); err != nil {
-			log.Printf("[Docker] Failed to write .env.local: %v", err)
-		} else {
-			log.Printf("[Docker] Wrote .env.local with %d variables", len(envVars))
-		}
-	}
-
 	// Check if repo has its own Dockerfile
 	hasDockerfile := fileExists(repoDir + "/Dockerfile")
 
@@ -47,9 +33,9 @@ func Build(repoDir, deploymentID, runtime, buildCmd, startCmd string, envVars ma
 		cmd = exec.Command("docker", "build", "-t", imageTag, ".")
 		cmd.Dir = repoDir
 	} else {
-		log.Printf("[Docker] Generating Dockerfile for runtime %s", runtime)
-		// Generate an inline Dockerfile
-		dockerfile := generateDockerfile(repoDir, runtime, buildCmd, startCmd)
+		log.Printf("[Docker] Generating Dockerfile for runtime %s with %d env vars", runtime, len(envVars))
+		// Generate an inline Dockerfile, injecting env vars directly to bypass .dockerignore
+		dockerfile := generateDockerfile(repoDir, runtime, buildCmd, startCmd, envVars)
 		cmd = exec.Command(
 			"docker", "build",
 			"-t", imageTag,
@@ -118,8 +104,25 @@ func findPackageJsons(repoDir string) []string {
 	return paths
 }
 
+// buildEnvBlock converts a map of env vars into a series of Dockerfile ENV statements.
+// Injecting directly into the Dockerfile guarantees availability during build AND runtime,
+// bypassing any .dockerignore rules that would block .env.local from being copied.
+func buildEnvBlock(envVars map[string]string) string {
+	if len(envVars) == 0 {
+		return ""
+	}
+	var sb strings.Builder
+	for k, v := range envVars {
+		// Wrap value in quotes and escape any embedded quotes
+		escapedVal := strings.ReplaceAll(v, `"`, `\"`)
+		sb.WriteString(fmt.Sprintf("ENV %s=\"%s\"\n", k, escapedVal))
+	}
+	return sb.String()
+}
+
 // generateDockerfile creates a minimal Dockerfile for common runtimes
-func generateDockerfile(repoDir, runtime, buildCmd, startCmd string) string {
+func generateDockerfile(repoDir, runtime, buildCmd, startCmd string, envVars map[string]string) string {
+	envBlock := buildEnvBlock(envVars)
 	switch {
 	case strings.HasPrefix(runtime, "node") && fileExists(repoDir+"/package.json"):
 		packageJsons := findPackageJsons(repoDir)
@@ -161,15 +164,17 @@ RUN %s
 COPY . .
 ENV NODE_OPTIONS="--max_old_space_size=1024"
 %s
+%s
 RUN %s
 
 FROM %s
 WORKDIR /app
 COPY --from=builder /app .
+%s
 EXPOSE 3000
 CMD %s
-`, runtime, copyLock, installCmd, buildRunStep, pruneCmd,
-			runtime, startCmd)
+`, runtime, copyLock, installCmd, envBlock, buildRunStep, pruneCmd,
+			runtime, envBlock, startCmd)
 
 	case strings.HasPrefix(runtime, "python") && fileExists(repoDir+"/requirements.txt"):
 		return fmt.Sprintf(`FROM %s

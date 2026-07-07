@@ -18,7 +18,7 @@ export async function allocateVm(): Promise<string | null> {
   const vm = await prisma.vm.findFirst({
     where: {
       status: {
-        in: ['AVAILABLE', 'ALLOCATED']
+        in: ['AVAILABLE', 'ALLOCATED', 'PROVISIONING']
       }
     },
     orderBy: {
