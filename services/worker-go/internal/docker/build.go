@@ -159,6 +159,7 @@ WORKDIR /app
 %s
 RUN %s
 COPY . .
+ENV NODE_OPTIONS="--max_old_space_size=1024"
 %s
 RUN %s
 
