@@ -60,6 +60,7 @@ projectRoutes.get('/:id', async (c) => {
           id: true, status: true, commitHash: true,
           commitMsg: true, branch: true, startedAt: true,
           finishedAt: true, duration: true, liveUrl: true,
+          logs: true,
         },
       },
     },
