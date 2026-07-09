@@ -50,7 +50,8 @@ deploymentRoutes.post(
       },
     })
 
-    let vmIp = process.env.ORACLE_VM_IP || '145.241.186.149'
+    // Resolve VM IP — prefer assigned VM, fall back to first ACTIVE VM in DB
+    let vmIp = process.env.GCP_VM_IP || process.env.ORACLE_VM_IP || '35.237.210.35'
     let decryptedToken = 'dev_secret'
 
     if (project.vm) {
@@ -62,6 +63,16 @@ deploymentRoutes.post(
       }
       vmIp = project.vm.ip
       decryptedToken = decrypt(project.vm.agentToken)
+    } else {
+      // No VM explicitly assigned — fall back to first ACTIVE VM
+      const activeVm = await prisma.vm.findFirst({
+        where: { status: 'ACTIVE' },
+        orderBy: { createdAt: 'asc' },
+      })
+      if (activeVm) {
+        vmIp = activeVm.ip
+        decryptedToken = decrypt(activeVm.agentToken)
+      }
     }
 
     // Push job to Redis → Go worker picks it up
