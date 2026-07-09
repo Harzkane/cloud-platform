@@ -71,15 +71,15 @@ async function cfFetch<T>(
 // Creates:     <appSlug>.<baseDomain> → Oracle VM IP
 //
 // Since fetch is native in Node 18+ / Hono, we use it directly.
-export async function createSubdomain(appSlug: string): Promise<{
+export async function createSubdomain(appSlug: string, targetIp?: string): Promise<{
   recordId: string;
   subdomain: string;
   url: string;
 }> {
   const baseDomain = process.env.BASE_DOMAIN ?? "naijadevhub.online";
-  const vmIp = process.env.ORACLE_VM_IP;
+  const vmIp = targetIp || process.env.GCP_VM_IP || process.env.ORACLE_VM_IP || '35.237.210.35';
 
-  if (!vmIp) throw new Error("Missing ORACLE_VM_IP env var");
+  if (!vmIp) throw new Error("Missing target VM IP");
 
   // Validate slug — only lowercase alphanumeric + hyphens
   if (!/^[a-z0-9-]{1,63}$/.test(appSlug)) {

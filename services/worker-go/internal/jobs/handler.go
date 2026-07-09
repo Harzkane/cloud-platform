@@ -161,7 +161,7 @@ func provisionHostVM(job DeployJob, logf func(string, string, ...any)) error {
 	}
 
 	targetIP := job.VmIP
-	if strings.HasPrefix(targetIP, "127.0.0.") || targetIP == "145.241.186.149" {
+	if strings.HasPrefix(targetIP, "127.0.0.") || targetIP == "145.241.186.149" || targetIP == "35.237.210.35" {
 		targetIP = "127.0.0.1"
 	}
 

@@ -94,7 +94,11 @@ projectRoutes.post('/', zValidator('json', createProjectSchema), async (c) => {
     data: { ...data, userId, vmId },
   })
 
-  if (!vmId) {
+  let allocatedIp: string | undefined
+  if (vmId) {
+    const vm = await prisma.vm.findUnique({ where: { id: vmId } })
+    allocatedIp = vm?.ip
+  } else {
     await triggerVmProvisioning(project.id)
   }
 
@@ -110,7 +114,7 @@ projectRoutes.post('/', zValidator('json', createProjectSchema), async (c) => {
   let subdomain = `${project.name}.${process.env.BASE_DOMAIN || 'naijadevhub.online'}`
   try {
     const slug = toAppSlug(project.name)
-    const dns = await createSubdomain(slug)
+    const dns = await createSubdomain(slug, allocatedIp)
     subdomain = dns.subdomain
   } catch (error) {
     console.error('Failed to create subdomain in Cloudflare:', error)

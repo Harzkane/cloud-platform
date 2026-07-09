@@ -21,7 +21,7 @@ function encrypt(text: string): string {
 const prisma = new PrismaClient()
 
 async function main() {
-  const targetIp = '145.241.186.149';
+  const targetIp = '35.237.210.35';
   const rawToken = 'dev-token-123';
   const encryptedToken = encrypt(rawToken);
 
